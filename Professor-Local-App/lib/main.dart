@@ -28,10 +28,10 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Your Classes'),
     );
   }
 }
@@ -61,10 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
     color: Colors.black,
   );
 
-  // Initialize variables
-  int _counter = 0;
-
-
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -72,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+      // _counter++;
     });
   }
 
@@ -94,38 +90,221 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Row(
+      body: const Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // First Column
-            const Column(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Column 1, Row 1'),
-                Text('Column 1, Row 2'),
-                // Add more widgets as needed for the first column
+                Text('Class 1 information', style: bodyText20),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Take attendance'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('View and edit data'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Edit class information'),
+                  ),
+                ),
               ],
             ),
-            // Spacer between columns
-            const SizedBox(width: 20),
-            // Second Column
-            Column(
+            SizedBox(height: 20), // Spacing
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Column 2, Row 1'),
-                Text('Column 2, Row 2, Pressed button $_counter times', style: bodyText20),
-                // Add more widgets as needed for the second column
+                Text('Class 2 information', style: bodyText20),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Take attendance'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('View and edit data'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Edit class information'),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Spacing
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Class 3 information', style: bodyText20),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Take attendance'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('View and edit data'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Edit class information'),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Spacing
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Class 4 information', style: bodyText20),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Take attendance'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('View and edit data'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Edit class information'),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Spacing
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Class 5 information', style: bodyText20),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Take attendance'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('View and edit data'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Edit class information'),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Spacing
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Class 6 information', style: bodyText20),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Take attendance'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('View and edit data'),
+                  ),
+                ),
+                SizedBox(width: 20), // Spacing
+                SizedBox(
+                  width: 150,
+                  child: FloatingActionButton(
+                    onPressed: null,
+                    child: Text('Edit class information'),
+                  ),
+                ),
               ],
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Add a class',
+            child: const Icon(Icons.add),
+          ),
+          const FloatingActionButton(
+            onPressed: null,
+            tooltip: 'Remove a class',
+            child: Icon(Icons.remove),
+          ),
+          const SizedBox(
+            width: 150,
+            child: FloatingActionButton(
+              onPressed: null,
+              child: Text('View all students'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
