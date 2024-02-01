@@ -1,4 +1,8 @@
+import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'class_information.dart';
 
 void main() {
@@ -14,24 +18,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Professor Attendance App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: PointerDeviceKind.values.toSet(),
+      ),
+      debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Your Classes'),
     );
   }
@@ -39,15 +32,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -62,6 +46,22 @@ class Home extends State<MyHomePage> {
     color: Colors.black,
   );
 
+  static const List<String> className = [
+    'Class name 1',
+    'Class name 2',
+    'Class name 3',
+    'Class name 4'
+  ];
+
+  static const List<String> classMeetingDays = ['MWF', 'TR', 'F', 'MWF'];
+
+  static const List<String> classMeetingTime = [
+    '8:30-9:35',
+    '12:20-2:00',
+    '12:20-3:20',
+    '12:15-1:20'
+  ];
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -73,14 +73,43 @@ class Home extends State<MyHomePage> {
     });
   }
 
+  void showAboutDialog({
+    required BuildContext context,
+    String? applicationName,
+    String? applicationVersion,
+    Widget? applicationIcon,
+    String? applicationLegalese,
+    List<Widget>? children,
+    bool barrierDismissible = true,
+    Color? barrierColor,
+    String? barrierLabel,
+    bool useRootNavigator = true,
+    RouteSettings? routeSettings,
+    Offset? anchorPoint,
+  }) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      barrierLabel: barrierLabel,
+      useRootNavigator: useRootNavigator,
+      builder: (BuildContext context) {
+        return AboutDialog(
+          applicationName: applicationName,
+          applicationVersion: applicationVersion,
+          applicationIcon: applicationIcon,
+          applicationLegalese: applicationLegalese,
+          children: children,
+        );
+      },
+      routeSettings: routeSettings,
+      anchorPoint: anchorPoint,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // This method is rerun every time setState is called
     return Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
@@ -91,224 +120,24 @@ class Home extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // First Column
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Class 1 information', style: bodyText20),
-                const SizedBox(width: 20), // Spacing
-                const SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class1Attendance',
-                    onPressed: null,
-                    child: Text('Take attendance'),
-                  ),
-                ),
-                const SizedBox(width: 20), // Spacing
-                const SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class1EditData',
-                    onPressed: null,
-                    child: Text('View and edit data'),
-                  ),
-                ),
-                const SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class1EditInfo',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ClassInformation()),
-                      );
-                    },
-                    child: const Text('Edit class information'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20), // Spacing
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Class 2 information', style: bodyText20),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class2Attendance',
-                    onPressed: null,
-                    child: Text('Take attendance'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class2EditData',
-                    onPressed: null,
-                    child: Text('View and edit data'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class2EditInfo',
-                    onPressed: null,
-                    child: Text('Edit class information'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20), // Spacing
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Class 3 information', style: bodyText20),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class3Attendance',
-                    onPressed: null,
-                    child: Text('Take attendance'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class3EditData',
-                    onPressed: null,
-                    child: Text('View and edit data'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class3EditInfo',
-                    onPressed: null,
-                    child: Text('Edit class information'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20), // Spacing
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Class 4 information', style: bodyText20),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class4Attendance',
-                    onPressed: null,
-                    child: Text('Take attendance'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class4EditData',
-                    onPressed: null,
-                    child: Text('View and edit data'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class4EditInfo',
-                    onPressed: null,
-                    child: Text('Edit class information'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20), // Spacing
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Class 5 information', style: bodyText20),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class5Attendance',
-                    onPressed: null,
-                    child: Text('Take attendance'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class5EditData',
-                    onPressed: null,
-                    child: Text('View and edit data'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class5EditInfo',
-                    onPressed: null,
-                    child: Text('Edit class information'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20), // Spacing
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Class 6 information', style: bodyText20),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class6Attendance',
-                    onPressed: null,
-                    child: Text('Take attendance'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class6EditData',
-                    onPressed: null,
-                    child: Text('View and edit data'),
-                  ),
-                ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'class6EditInfo',
-                    onPressed: null,
-                    child: Text('Edit class information'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+      body: TwoDimensionalGridView(
+        diagonalDragBehavior: DiagonalDragBehavior.free,
+        delegate: TwoDimensionalChildBuilderDelegate(
+            maxXIndex: 0,
+            maxYIndex: className.length,
+            builder: (BuildContext context, ChildVicinity vicinity) {
+              return SizedBox(
+                height: 50,
+                width: 400,
+                child: Center(
+                    child: Text(
+                  '${className[vicinity.xIndex]} ${classMeetingDays[vicinity.xIndex]} ${classMeetingTime[vicinity.xIndex]}',
+                  style: bodyText20,
+                )),
+              );
+            }),
       ),
-      floatingActionButton: Row(
+      bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           FloatingActionButton(
@@ -331,8 +160,167 @@ class Home extends State<MyHomePage> {
               child: Text('View all students'),
             ),
           ),
+          SizedBox(
+            width: 100,
+            child: FloatingActionButton(
+              heroTag: 'license',
+              onPressed: () {
+                showAboutDialog(context: context, applicationVersion: "0.0.0");
+              },
+              child: const Text('About'),
+            ),
+          ),
         ],
       ),
     );
+  }
+}
+
+class TwoDimensionalGridView extends TwoDimensionalScrollView {
+  const TwoDimensionalGridView({
+    super.key,
+    super.primary,
+    super.mainAxis = Axis.vertical,
+    super.verticalDetails = const ScrollableDetails.vertical(),
+    super.horizontalDetails = const ScrollableDetails.horizontal(),
+    required TwoDimensionalChildBuilderDelegate delegate,
+    super.cacheExtent,
+    super.diagonalDragBehavior = DiagonalDragBehavior.none,
+    super.dragStartBehavior = DragStartBehavior.start,
+    super.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
+    super.clipBehavior = Clip.hardEdge,
+  }) : super(delegate: delegate);
+
+  @override
+  Widget buildViewport(
+    BuildContext context,
+    ViewportOffset verticalOffset,
+    ViewportOffset horizontalOffset,
+  ) {
+    return TwoDimensionalGridViewport(
+      horizontalOffset: horizontalOffset,
+      horizontalAxisDirection: horizontalDetails.direction,
+      verticalOffset: verticalOffset,
+      verticalAxisDirection: verticalDetails.direction,
+      mainAxis: mainAxis,
+      delegate: delegate as TwoDimensionalChildBuilderDelegate,
+      cacheExtent: cacheExtent,
+      clipBehavior: clipBehavior,
+    );
+  }
+}
+
+class TwoDimensionalGridViewport extends TwoDimensionalViewport {
+  const TwoDimensionalGridViewport({
+    super.key,
+    required super.verticalOffset,
+    required super.verticalAxisDirection,
+    required super.horizontalOffset,
+    required super.horizontalAxisDirection,
+    required TwoDimensionalChildBuilderDelegate super.delegate,
+    required super.mainAxis,
+    super.cacheExtent,
+    super.clipBehavior = Clip.hardEdge,
+  });
+
+  @override
+  RenderTwoDimensionalViewport createRenderObject(BuildContext context) {
+    return RenderTwoDimensionalGridViewport(
+      horizontalOffset: horizontalOffset,
+      horizontalAxisDirection: horizontalAxisDirection,
+      verticalOffset: verticalOffset,
+      verticalAxisDirection: verticalAxisDirection,
+      mainAxis: mainAxis,
+      delegate: delegate as TwoDimensionalChildBuilderDelegate,
+      childManager: context as TwoDimensionalChildManager,
+      cacheExtent: cacheExtent,
+      clipBehavior: clipBehavior,
+    );
+  }
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    RenderTwoDimensionalGridViewport renderObject,
+  ) {
+    renderObject
+      ..horizontalOffset = horizontalOffset
+      ..horizontalAxisDirection = horizontalAxisDirection
+      ..verticalOffset = verticalOffset
+      ..verticalAxisDirection = verticalAxisDirection
+      ..mainAxis = mainAxis
+      ..delegate = delegate
+      ..cacheExtent = cacheExtent
+      ..clipBehavior = clipBehavior;
+  }
+}
+
+class RenderTwoDimensionalGridViewport extends RenderTwoDimensionalViewport {
+  RenderTwoDimensionalGridViewport({
+    required super.horizontalOffset,
+    required super.horizontalAxisDirection,
+    required super.verticalOffset,
+    required super.verticalAxisDirection,
+    required TwoDimensionalChildBuilderDelegate delegate,
+    required super.mainAxis,
+    required super.childManager,
+    super.cacheExtent,
+    super.clipBehavior = Clip.hardEdge,
+  }) : super(delegate: delegate);
+
+  @override
+  void layoutChildSequence() {
+    final double horizontalPixels = horizontalOffset.pixels;
+    final double verticalPixels = verticalOffset.pixels;
+    final double viewportWidth = viewportDimension.width + cacheExtent;
+    final double viewportHeight = viewportDimension.height + cacheExtent;
+    final TwoDimensionalChildBuilderDelegate builderDelegate =
+        delegate as TwoDimensionalChildBuilderDelegate;
+
+    final int maxRowIndex = builderDelegate.maxYIndex!;
+    final int maxColumnIndex = builderDelegate.maxXIndex!;
+
+    final int leadingColumn = math.max((horizontalPixels / 200).floor(), 0);
+    final int leadingRow = math.max((verticalPixels / 200).floor(), 0);
+    final int trailingColumn = math.min(
+      ((horizontalPixels + viewportWidth) / 200).ceil(),
+      maxColumnIndex,
+    );
+    final int trailingRow = math.min(
+      ((verticalPixels + viewportHeight) / 200).ceil(),
+      maxRowIndex,
+    );
+
+    double xLayoutOffset = (leadingColumn * 200) - horizontalOffset.pixels;
+    for (int column = leadingColumn; column <= trailingColumn; column++) {
+      double yLayoutOffset = (leadingRow * 200) - verticalOffset.pixels;
+      for (int row = leadingRow; row <= trailingRow; row++) {
+        final ChildVicinity vicinity =
+            ChildVicinity(xIndex: column, yIndex: row);
+        final RenderBox child = buildOrObtainChildFor(vicinity)!;
+        child.layout(constraints.loosen());
+
+        // Subclasses only need to set the normalized layout offset. The super
+        // class adjusts for reversed axes.
+        parentDataOf(child).layoutOffset = Offset(xLayoutOffset, yLayoutOffset);
+        yLayoutOffset += 200;
+      }
+      xLayoutOffset += 200;
+    }
+
+    // Set the min and max scroll extents for each axis.
+    final double verticalExtent = 200 * (maxRowIndex + 1);
+    verticalOffset.applyContentDimensions(
+      0.0,
+      clampDouble(
+          verticalExtent - viewportDimension.height, 0.0, double.infinity),
+    );
+    final double horizontalExtent = 200 * (maxColumnIndex + 1);
+    horizontalOffset.applyContentDimensions(
+      0.0,
+      clampDouble(
+          horizontalExtent - viewportDimension.width, 0.0, double.infinity),
+    );
+    // Super class handles garbage collection too!
   }
 }
