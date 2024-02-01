@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'class_information.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,10 +52,10 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => Home();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class Home extends State<MyHomePage> {
   // Theme
   static const TextStyle bodyText20 = TextStyle(
     fontSize: 20,
@@ -90,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -98,35 +99,44 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Class 1 information', style: bodyText20),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
+                const Text('Class 1 information', style: bodyText20),
+                const SizedBox(width: 20), // Spacing
+                const SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class1Attendance',
                     onPressed: null,
                     child: Text('Take attendance'),
                   ),
                 ),
-                SizedBox(width: 20), // Spacing
-                SizedBox(
+                const SizedBox(width: 20), // Spacing
+                const SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class1EditData',
                     onPressed: null,
                     child: Text('View and edit data'),
                   ),
                 ),
-                SizedBox(width: 20), // Spacing
+                const SizedBox(width: 20), // Spacing
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
-                    onPressed: null,
-                    child: Text('Edit class information'),
+                    heroTag: 'class1EditInfo',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ClassInformation()),
+                      );
+                    },
+                    child: const Text('Edit class information'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20), // Spacing
-            Row(
+            const SizedBox(height: 20), // Spacing
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Class 2 information', style: bodyText20),
@@ -134,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class2Attendance',
                     onPressed: null,
                     child: Text('Take attendance'),
                   ),
@@ -142,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class2EditData',
                     onPressed: null,
                     child: Text('View and edit data'),
                   ),
@@ -150,14 +162,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class2EditInfo',
                     onPressed: null,
                     child: Text('Edit class information'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20), // Spacing
-            Row(
+            const SizedBox(height: 20), // Spacing
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Class 3 information', style: bodyText20),
@@ -165,6 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class3Attendance',
                     onPressed: null,
                     child: Text('Take attendance'),
                   ),
@@ -173,6 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class3EditData',
                     onPressed: null,
                     child: Text('View and edit data'),
                   ),
@@ -181,14 +196,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class3EditInfo',
                     onPressed: null,
                     child: Text('Edit class information'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20), // Spacing
-            Row(
+            const SizedBox(height: 20), // Spacing
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Class 4 information', style: bodyText20),
@@ -196,6 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class4Attendance',
                     onPressed: null,
                     child: Text('Take attendance'),
                   ),
@@ -204,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class4EditData',
                     onPressed: null,
                     child: Text('View and edit data'),
                   ),
@@ -212,14 +230,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class4EditInfo',
                     onPressed: null,
                     child: Text('Edit class information'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20), // Spacing
-            Row(
+            const SizedBox(height: 20), // Spacing
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Class 5 information', style: bodyText20),
@@ -227,6 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class5Attendance',
                     onPressed: null,
                     child: Text('Take attendance'),
                   ),
@@ -235,6 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class5EditData',
                     onPressed: null,
                     child: Text('View and edit data'),
                   ),
@@ -243,14 +264,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class5EditInfo',
                     onPressed: null,
                     child: Text('Edit class information'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20), // Spacing
-            Row(
+            const SizedBox(height: 20), // Spacing
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Class 6 information', style: bodyText20),
@@ -258,6 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class6Attendance',
                     onPressed: null,
                     child: Text('Take attendance'),
                   ),
@@ -266,6 +289,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class6EditData',
                     onPressed: null,
                     child: Text('View and edit data'),
                   ),
@@ -274,6 +298,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   width: 150,
                   child: FloatingActionButton(
+                    heroTag: 'class6EditInfo',
                     onPressed: null,
                     child: Text('Edit class information'),
                   ),
@@ -287,11 +312,13 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           FloatingActionButton(
+            heroTag: 'addClass',
             onPressed: _incrementCounter,
             tooltip: 'Add a class',
             child: const Icon(Icons.add),
           ),
           const FloatingActionButton(
+            heroTag: 'removeClass',
             onPressed: null,
             tooltip: 'Remove a class',
             child: Icon(Icons.remove),
@@ -299,6 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(
             width: 150,
             child: FloatingActionButton(
+              heroTag: 'viewAllStudents',
               onPressed: null,
               child: Text('View all students'),
             ),
