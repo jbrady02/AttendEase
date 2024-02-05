@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ClassInformation extends StatelessWidget {
-  const ClassInformation({super.key});
+  final int classID;
+
+  const ClassInformation(this.classID, {super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

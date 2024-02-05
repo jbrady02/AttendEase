@@ -17,10 +17,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Professor Attendance App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-      ),
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: PointerDeviceKind.values.toSet(),
       ),
@@ -45,16 +41,16 @@ class Home extends State<MyHomePage> {
     fontSize: 20,
     color: Colors.black,
   );
+  static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
 
+  static const List<int> classID = [0, 1, 2, 3];
   static const List<String> className = [
     'Class name 1',
     'Class name 2',
     'Class name 3',
     'Class name 4'
   ];
-
   static const List<String> classMeetingDays = ['MWF', 'TR', 'F', 'MWF'];
-
   static const List<String> classMeetingTime = [
     '8:30-9:35',
     '12:20-2:00',
@@ -112,28 +108,62 @@ class Home extends State<MyHomePage> {
     // This method is rerun every time setState is called
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+        backgroundColor: primaryColor,
         title: Text(widget.title),
       ),
       body: TwoDimensionalGridView(
         diagonalDragBehavior: DiagonalDragBehavior.free,
         delegate: TwoDimensionalChildBuilderDelegate(
-            maxXIndex: 0,
-            maxYIndex: className.length,
+            maxXIndex: 3,
+            maxYIndex: className.length - 1,
             builder: (BuildContext context, ChildVicinity vicinity) {
               return SizedBox(
-                height: 50,
-                width: 400,
+                height: 100,
+                width: (vicinity.xIndex == 0) ? 400 : 600,
                 child: Center(
-                    child: Text(
-                  '${className[vicinity.xIndex]} ${classMeetingDays[vicinity.xIndex]} ${classMeetingTime[vicinity.xIndex]}',
-                  style: bodyText20,
-                )),
+                    child: (vicinity.xIndex == 0)
+                        ? Center(
+                            child: Text(
+                              '${className[vicinity.yIndex]} ${classMeetingDays[vicinity.yIndex]} ${classMeetingTime[vicinity.yIndex]}',
+                              style: bodyText20,
+                            ),
+                          )
+                        : (vicinity.xIndex == 1)
+                            ? ElevatedButton(
+                                onPressed: null,
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        primaryColor)),
+                                child: const Text('Take attendance',
+                                    style: bodyText20),
+                              )
+                            : (vicinity.xIndex == 2)
+                                ? ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ClassInformation(
+                                                    vicinity.yIndex)),
+                                      );
+                                    },
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                primaryColor)),
+                                    child: const Text('View/edit data',
+                                        style: bodyText20),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: null,
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                primaryColor)),
+                                    child: const Text('Edit class info',
+                                        style: bodyText20),
+                                  )),
               );
             }),
       ),
@@ -143,12 +173,14 @@ class Home extends State<MyHomePage> {
           FloatingActionButton(
             heroTag: 'addClass',
             onPressed: _incrementCounter,
+            backgroundColor: primaryColor,
             tooltip: 'Add a class',
             child: const Icon(Icons.add),
           ),
           const FloatingActionButton(
             heroTag: 'removeClass',
             onPressed: null,
+            backgroundColor: primaryColor,
             tooltip: 'Remove a class',
             child: Icon(Icons.remove),
           ),
@@ -157,6 +189,7 @@ class Home extends State<MyHomePage> {
             child: FloatingActionButton(
               heroTag: 'viewAllStudents',
               onPressed: null,
+              backgroundColor: primaryColor,
               child: Text('View all students'),
             ),
           ),
@@ -167,6 +200,7 @@ class Home extends State<MyHomePage> {
               onPressed: () {
                 showAboutDialog(context: context, applicationVersion: "0.0.0");
               },
+              backgroundColor: primaryColor,
               child: const Text('About'),
             ),
           ),
@@ -281,19 +315,19 @@ class RenderTwoDimensionalGridViewport extends RenderTwoDimensionalViewport {
     final int maxColumnIndex = builderDelegate.maxXIndex!;
 
     final int leadingColumn = math.max((horizontalPixels / 200).floor(), 0);
-    final int leadingRow = math.max((verticalPixels / 200).floor(), 0);
+    final int leadingRow = math.max((verticalPixels / 100).floor(), 0);
     final int trailingColumn = math.min(
       ((horizontalPixels + viewportWidth) / 200).ceil(),
       maxColumnIndex,
     );
     final int trailingRow = math.min(
-      ((verticalPixels + viewportHeight) / 200).ceil(),
+      ((verticalPixels + viewportHeight) / 100).ceil(),
       maxRowIndex,
     );
 
     double xLayoutOffset = (leadingColumn * 200) - horizontalOffset.pixels;
     for (int column = leadingColumn; column <= trailingColumn; column++) {
-      double yLayoutOffset = (leadingRow * 200) - verticalOffset.pixels;
+      double yLayoutOffset = (leadingRow * 100) - verticalOffset.pixels;
       for (int row = leadingRow; row <= trailingRow; row++) {
         final ChildVicinity vicinity =
             ChildVicinity(xIndex: column, yIndex: row);
@@ -303,13 +337,13 @@ class RenderTwoDimensionalGridViewport extends RenderTwoDimensionalViewport {
         // Subclasses only need to set the normalized layout offset. The super
         // class adjusts for reversed axes.
         parentDataOf(child).layoutOffset = Offset(xLayoutOffset, yLayoutOffset);
-        yLayoutOffset += 200;
+        yLayoutOffset += 100;
       }
       xLayoutOffset += 200;
     }
 
     // Set the min and max scroll extents for each axis.
-    final double verticalExtent = 200 * (maxRowIndex + 1);
+    final double verticalExtent = 100 * (maxRowIndex + 1);
     verticalOffset.applyContentDimensions(
       0.0,
       clampDouble(
