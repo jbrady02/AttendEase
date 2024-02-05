@@ -37,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 
 class Home extends State<MyHomePage> {
   // Theme
-  static const TextStyle bodyText20 = TextStyle(
+  static const TextStyle bodyText = TextStyle(
     fontSize: 20,
     color: Colors.black,
   );
@@ -125,7 +125,7 @@ class Home extends State<MyHomePage> {
                         ? Center(
                             child: Text(
                               '${className[vicinity.yIndex]} ${classMeetingDays[vicinity.yIndex]} ${classMeetingTime[vicinity.yIndex]}',
-                              style: bodyText20,
+                              style: bodyText,
                             ),
                           )
                         : (vicinity.xIndex == 1)
@@ -135,7 +135,7 @@ class Home extends State<MyHomePage> {
                                     backgroundColor: MaterialStateProperty.all(
                                         primaryColor)),
                                 child: const Text('Take attendance',
-                                    style: bodyText20),
+                                    style: bodyText),
                               )
                             : (vicinity.xIndex == 2)
                                 ? ElevatedButton(
@@ -153,7 +153,7 @@ class Home extends State<MyHomePage> {
                                             MaterialStateProperty.all(
                                                 primaryColor)),
                                     child: const Text('View/edit data',
-                                        style: bodyText20),
+                                        style: bodyText),
                                   )
                                 : ElevatedButton(
                                     onPressed: null,
@@ -162,7 +162,7 @@ class Home extends State<MyHomePage> {
                                             MaterialStateProperty.all(
                                                 primaryColor)),
                                     child: const Text('Edit class info',
-                                        style: bodyText20),
+                                        style: bodyText),
                                   )),
               );
             }),
@@ -185,12 +185,12 @@ class Home extends State<MyHomePage> {
             child: Icon(Icons.remove),
           ),
           const SizedBox(
-            width: 150,
+            width: 200,
             child: FloatingActionButton(
               heroTag: 'viewAllStudents',
               onPressed: null,
               backgroundColor: primaryColor,
-              child: Text('View all students'),
+              child: Text('View all students', style: bodyText),
             ),
           ),
           SizedBox(
@@ -201,7 +201,7 @@ class Home extends State<MyHomePage> {
                 showAboutDialog(context: context, applicationVersion: "0.0.0");
               },
               backgroundColor: primaryColor,
-              child: const Text('About'),
+              child: const Text('About', style: bodyText),
             ),
           ),
         ],
