@@ -118,7 +118,7 @@ class Home extends State<MyHomePage> {
             maxYIndex: className.length - 1,
             builder: (BuildContext context, ChildVicinity vicinity) {
               return SizedBox(
-                height: 100,
+                height: 75,
                 width: (vicinity.xIndex == 0) ? 400 : 600,
                 child: Center(
                     child: (vicinity.xIndex == 0)
@@ -126,6 +126,7 @@ class Home extends State<MyHomePage> {
                             child: Text(
                               '${className[vicinity.yIndex]} ${classMeetingDays[vicinity.yIndex]} ${classMeetingTime[vicinity.yIndex]}',
                               style: bodyText,
+                              textAlign: TextAlign.center,
                             ),
                           )
                         : (vicinity.xIndex == 1)
@@ -143,9 +144,9 @@ class Home extends State<MyHomePage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                ClassInformation(
-                                                    vicinity.yIndex)),
+                                            builder: (context) => ClassInformation(
+                                                vicinity.yIndex,
+                                                '${className[vicinity.yIndex]} ${classMeetingDays[vicinity.yIndex]} ${classMeetingTime[vicinity.yIndex]}')),
                                       );
                                     },
                                     style: ButtonStyle(
@@ -315,19 +316,19 @@ class RenderTwoDimensionalGridViewport extends RenderTwoDimensionalViewport {
     final int maxColumnIndex = builderDelegate.maxXIndex!;
 
     final int leadingColumn = math.max((horizontalPixels / 200).floor(), 0);
-    final int leadingRow = math.max((verticalPixels / 100).floor(), 0);
+    final int leadingRow = math.max((verticalPixels / 75).floor(), 0);
     final int trailingColumn = math.min(
       ((horizontalPixels + viewportWidth) / 200).ceil(),
       maxColumnIndex,
     );
     final int trailingRow = math.min(
-      ((verticalPixels + viewportHeight) / 100).ceil(),
+      ((verticalPixels + viewportHeight) / 75).ceil(),
       maxRowIndex,
     );
 
     double xLayoutOffset = (leadingColumn * 200) - horizontalOffset.pixels;
     for (int column = leadingColumn; column <= trailingColumn; column++) {
-      double yLayoutOffset = (leadingRow * 100) - verticalOffset.pixels;
+      double yLayoutOffset = (leadingRow * 75) - verticalOffset.pixels;
       for (int row = leadingRow; row <= trailingRow; row++) {
         final ChildVicinity vicinity =
             ChildVicinity(xIndex: column, yIndex: row);
@@ -337,13 +338,13 @@ class RenderTwoDimensionalGridViewport extends RenderTwoDimensionalViewport {
         // Subclasses only need to set the normalized layout offset. The super
         // class adjusts for reversed axes.
         parentDataOf(child).layoutOffset = Offset(xLayoutOffset, yLayoutOffset);
-        yLayoutOffset += 100;
+        yLayoutOffset += 75;
       }
       xLayoutOffset += 200;
     }
 
     // Set the min and max scroll extents for each axis.
-    final double verticalExtent = 100 * (maxRowIndex + 1);
+    final double verticalExtent = 75 * (maxRowIndex + 1);
     verticalOffset.applyContentDimensions(
       0.0,
       clampDouble(
