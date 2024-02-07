@@ -18,12 +18,13 @@ class ClassInformation extends StatelessWidget {
 
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
 
-  /// 0: No data
-  /// 1: Present
-  /// 2: Absent (excused)
-  /// 3: Absent (unexcused)
-  /// 4: Tardy (excused)
-  /// 5: Tardy (unexcused)
+  static const int noData = 0;
+  static const int present = 1;
+  static const int absentExcused = 2;
+  static const int absentUnexcused = 3;
+  static const int tardyExcused = 4;
+  static const int tardyUnexcused = 5;
+
   static const List<Map<String, List<int>>> students = [
     {
       'Long String Name': [1, 2, 3, 4, 5]
