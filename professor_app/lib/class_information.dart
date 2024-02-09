@@ -47,6 +47,36 @@ class ClassInformation extends StatelessWidget {
     '2023-07-09',
   ];
 
+  String getAttendance(int attendanceInt) {
+    switch (attendanceInt) {
+      case present:
+        return 'P';
+      case absentExcused:
+        return 'AE';
+      case absentUnexcused:
+        return 'AU';
+      case tardyExcused:
+        return 'TE';
+      case tardyUnexcused:
+        return 'TU';
+      default:
+        return '?';
+    }
+  }
+
+  Color getColor(int attendanceInt) {
+    switch (attendanceInt) {
+      case present:
+        return Colors.green;
+      case absentExcused || absentUnexcused:
+        return Colors.orange;
+      case tardyExcused || tardyUnexcused:
+        return Colors.yellow;
+      default:
+        return Colors.white;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,26 +110,33 @@ class ClassInformation extends StatelessWidget {
                                 ? Center(
                                     child: Padding(
                                     padding: const EdgeInsets.only(
-                                        left: 12.5, right: 12.5),
+                                        left: 13, right: 13),
                                     child: Text(
                                         // Date
                                         classSessions[vicinity.xIndex - 1],
                                         style: bodyText,
                                         textAlign: TextAlign.center),
                                   ))
-                                : ElevatedButton(
-                                    // Attendance
-                                    onPressed: null,
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                primaryColor)),
-                                    child: Text(
-                                        students[vicinity.yIndex - 1]
-                                            .values
-                                            .toList()[0][vicinity.xIndex - 1]
-                                            .toString(),
-                                        style: bodyText),
+                                : SizedBox(
+                                    width: 70,
+                                    child: ElevatedButton(
+                                      // Attendance
+                                      onPressed: null,
+                                      style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty
+                                              .all(getColor(
+                                                  students[vicinity.yIndex - 1]
+                                                          .values
+                                                          .toList()[0]
+                                                      [vicinity.xIndex - 1]))),
+                                      child: Text(
+                                          getAttendance(
+                                              students[vicinity.yIndex - 1]
+                                                      .values
+                                                      .toList()[0]
+                                                  [vicinity.xIndex - 1]),
+                                          style: bodyText),
+                                    ),
                                   ),
                   ));
             }),

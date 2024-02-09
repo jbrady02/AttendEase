@@ -130,40 +130,51 @@ class Home extends State<MyHomePage> {
                             ),
                           )
                         : (vicinity.xIndex == 1)
-                            ? ElevatedButton(
-                                onPressed: null,
-                                style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                        primaryColor)),
-                                child: const Text('Take attendance',
-                                    style: bodyText),
+                            ? SizedBox(
+                                width: 197,
+                                child: ElevatedButton(
+                                  onPressed: null,
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              primaryColor)),
+                                  child: const Text('Take attendance',
+                                      style: bodyText),
+                                ),
                               )
                             : (vicinity.xIndex == 2)
-                                ? ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => ClassInformation(
-                                                vicinity.yIndex,
-                                                '${className[vicinity.yIndex]} ${classMeetingDays[vicinity.yIndex]} ${classMeetingTime[vicinity.yIndex]}')),
-                                      );
-                                    },
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                primaryColor)),
-                                    child: const Text('View/edit data',
-                                        style: bodyText),
+                                ? SizedBox(
+                                    width: 197,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ClassInformation(
+                                                      vicinity.yIndex,
+                                                      '${className[vicinity.yIndex]} ${classMeetingDays[vicinity.yIndex]} ${classMeetingTime[vicinity.yIndex]}')),
+                                        );
+                                      },
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  primaryColor)),
+                                      child: const Text('View/edit data',
+                                          style: bodyText),
+                                    ),
                                   )
-                                : ElevatedButton(
-                                    onPressed: null,
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                primaryColor)),
-                                    child: const Text('Edit class info',
-                                        style: bodyText),
+                                : SizedBox(
+                                    width: 197,
+                                    child: ElevatedButton(
+                                      onPressed: null,
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  primaryColor)),
+                                      child: const Text('Edit class info',
+                                          style: bodyText),
+                                    ),
                                   )),
               );
             }),
