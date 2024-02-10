@@ -77,6 +77,17 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
+  Color getOutlineColor(int attendanceInt) {
+    switch (attendanceInt) {
+      case absentUnexcused || tardyUnexcused:
+        return Colors.red;
+      case noData:
+        return Colors.black;
+      default:
+        return Colors.transparent;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,8 +113,20 @@ class ClassInformation extends StatelessWidget {
                                     // Name
                                     students[vicinity.yIndex - 1]
                                         .keys
-                                        .toList()[0],
-                                    style: bodyText,
+                                        .toList()[0]
+                                        .replaceAll('-', '-\n'),
+                                    style:
+                                        // Separate name by spaces and if a
+                                        // token has than 8 characters,
+                                        // decrease the font size
+                                        students[vicinity.yIndex - 1]
+                                                .keys
+                                                .toList()[0]
+                                                .split(' ')
+                                                .any((element) =>
+                                                    element.length > 8)
+                                            ? bodyText.copyWith(fontSize: 12)
+                                            : bodyText,
                                     textAlign: TextAlign.center),
                               )
                             : (vicinity.yIndex == 0)
@@ -119,16 +142,23 @@ class ClassInformation extends StatelessWidget {
                                   ))
                                 : SizedBox(
                                     width: 70,
-                                    child: ElevatedButton(
+                                    child: OutlinedButton(
                                       // Attendance
                                       onPressed: null,
-                                      style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty
-                                              .all(getColor(
+                                      style: OutlinedButton.styleFrom(
+                                          side: BorderSide(
+                                              color: getOutlineColor(
                                                   students[vicinity.yIndex - 1]
                                                           .values
                                                           .toList()[0]
-                                                      [vicinity.xIndex - 1]))),
+                                                      [vicinity.xIndex - 1]),
+                                              width: 3), // Set the border color
+                                          backgroundColor: getColor(
+                                              students[vicinity.yIndex - 1]
+                                                      .values
+                                                      .toList()[0]
+                                                  [vicinity.xIndex - 1])),
+                                      // Set the background color
                                       child: Text(
                                           getAttendance(
                                               students[vicinity.yIndex - 1]
