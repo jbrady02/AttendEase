@@ -8,37 +8,34 @@ class ClassInformation extends StatelessWidget {
   final int classID;
   final String classInfo;
 
-  const ClassInformation(this.classID, this.classInfo, {super.key});
+  ClassInformation(this.classID, this.classInfo, {super.key});
 
   // Theme
   static const TextStyle bodyText = TextStyle(
+    fontSize: 20,
+    color: Colors.black,
+  );
+  static const TextStyle smallBodyText = TextStyle(
     fontSize: 16,
     color: Colors.black,
   );
 
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
 
-  static const int noData = 0;
+  static const int unknown = 0;
   static const int present = 1;
   static const int absentExcused = 2;
   static const int absentUnexcused = 3;
   static const int tardyExcused = 4;
   static const int tardyUnexcused = 5;
 
-  static const List<Map<String, List<int>>> students = [
-    {
-      'Long String Name': [1, 2, 3, 4, 5]
-    },
-    {
-      'Jane Doe': [1, 0, 1, 1, 1]
-    },
-    {
-      'Alice': [0, 0, 0, 0, 0]
-    },
-    {
-      'Bob': [0, 1, 0, 1, 1]
-    },
-  ];
+  static const Map<String, List<int>> students = {
+    'Long String Name': [1, 2, 3, 4, 5],
+    'Jane Doe': [1, 0, 1, 1, 1],
+    'Alice': [0, 0, 0, 0, 0],
+    'Bob': [0, 1, 0, 1, 1]
+  };
+
   static const List<String> classSessions = [
     '2024-07-01',
     '2024-07-03',
@@ -81,11 +78,96 @@ class ClassInformation extends StatelessWidget {
     switch (attendanceInt) {
       case absentUnexcused || tardyUnexcused:
         return Colors.red;
-      case noData:
+      case unknown:
         return Colors.black;
       default:
         return Colors.transparent;
     }
+  }
+
+  void _showSelectionDialog(
+      BuildContext context, int nameIndex, int dateIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text('Edit attendance data for '
+              '${students.keys.toList()[nameIndex]} '
+              'on ${classSessions[dateIndex]}:'),
+          children: [
+            Container(
+              color: Colors.green,
+              child: SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, present);
+                },
+                child: students.values.toList()[nameIndex][dateIndex] == present
+                    ? const Text('Present (current value)', style: bodyText)
+                    : const Text('Present', style: bodyText),
+              ),
+            ),
+            Container(
+              color: Colors.orange,
+              child: SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, absentExcused);
+                },
+                child: students.values.toList()[nameIndex][dateIndex] == absentExcused
+                    ? const Text('Absent and excused (current value)',
+                        style: bodyText)
+                    : const Text('Absent and excused', style: bodyText),
+              ),
+            ),
+            Container(
+              color: Colors.orange,
+              child: SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, absentUnexcused);
+                },
+                child: students.values.toList()[nameIndex][dateIndex] == absentUnexcused
+                    ? const Text('Absent and unexcused (current value)',
+                        style: bodyText)
+                    : const Text('Absent and unexcused', style: bodyText),
+              ),
+            ),
+            Container(
+              color: Colors.yellow,
+              child: SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, tardyExcused);
+                },
+                child: students.values.toList()[nameIndex][dateIndex] == tardyExcused
+                    ? const Text('Tardy and excused (current value)',
+                        style: bodyText)
+                    : const Text('Tardy and excused', style: bodyText),
+              ),
+            ),
+            Container(
+              color: Colors.yellow,
+              child: SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, tardyUnexcused);
+                },
+                child: students.values.toList()[nameIndex][dateIndex] == tardyUnexcused
+                    ? const Text('Tardy and unexcused (current value)',
+                        style: bodyText)
+                    : const Text('Tardy and unexcused', style: bodyText),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, unknown);
+              },
+              child: students.values.toList()[nameIndex][dateIndex] == unknown
+                  ? const Text('Unknown (current value)', style: bodyText)
+                  : const Text('Unknown', style: bodyText),
+            ),
+          ],
+        );
+      },
+    ).then((selectedValue) {
+      null;
+    });
   }
 
   @override
@@ -98,7 +180,7 @@ class ClassInformation extends StatelessWidget {
       body: TwoDimensionalGridView(
         diagonalDragBehavior: DiagonalDragBehavior.free,
         delegate: TwoDimensionalChildBuilderDelegate(
-            maxXIndex: students[0].values.toList()[0].length,
+            maxXIndex: students.values.first.length,
             maxYIndex: students.length,
             builder: (BuildContext context, ChildVicinity vicinity) {
               return SizedBox(
@@ -111,22 +193,21 @@ class ClassInformation extends StatelessWidget {
                             ? Center(
                                 child: Text(
                                     // Name
-                                    students[vicinity.yIndex - 1]
-                                        .keys
-                                        .toList()[0]
+                                    students.keys
+                                        .toList()[vicinity.yIndex - 1]
                                         .replaceAll('-', '-\n'),
                                     style:
                                         // Separate name by spaces and if a
                                         // token has than 8 characters,
                                         // decrease the font size
-                                        students[vicinity.yIndex - 1]
-                                                .keys
-                                                .toList()[0]
+                                        students.keys
+                                                .toList()[vicinity.yIndex - 1]
                                                 .split(' ')
                                                 .any((element) =>
                                                     element.length > 8)
-                                            ? bodyText.copyWith(fontSize: 12)
-                                            : bodyText,
+                                            ? smallBodyText.copyWith(
+                                                fontSize: 12)
+                                            : smallBodyText,
                                     textAlign: TextAlign.center),
                               )
                             : (vicinity.yIndex == 0)
@@ -137,35 +218,38 @@ class ClassInformation extends StatelessWidget {
                                     child: Text(
                                         // Date
                                         classSessions[vicinity.xIndex - 1],
-                                        style: bodyText,
+                                        style: smallBodyText,
                                         textAlign: TextAlign.center),
                                   ))
                                 : SizedBox(
                                     width: 70,
                                     child: OutlinedButton(
                                       // Attendance
-                                      onPressed: null,
+                                      onPressed: () {
+                                        _showSelectionDialog(
+                                            context,
+                                            vicinity.yIndex - 1,
+                                            vicinity.xIndex - 1);
+                                      },
                                       style: OutlinedButton.styleFrom(
                                           side: BorderSide(
                                               color: getOutlineColor(
-                                                  students[vicinity.yIndex - 1]
-                                                          .values
-                                                          .toList()[0]
+                                                  students.values.toList()[
+                                                          vicinity.yIndex - 1]
                                                       [vicinity.xIndex - 1]),
                                               width: 3), // Set the border color
-                                          backgroundColor: getColor(
-                                              students[vicinity.yIndex - 1]
-                                                      .values
-                                                      .toList()[0]
-                                                  [vicinity.xIndex - 1])),
+                                          backgroundColor: getColor(students
+                                                  .values
+                                                  .toList()[vicinity.yIndex - 1]
+                                              [vicinity.xIndex - 1])),
                                       // Set the background color
                                       child: Text(
                                           getAttendance(
-                                              students[vicinity.yIndex - 1]
-                                                      .values
-                                                      .toList()[0]
+                                              // Get integer value in list from map
+                                              students.values.toList()[
+                                                      vicinity.yIndex - 1]
                                                   [vicinity.xIndex - 1]),
-                                          style: bodyText),
+                                          style: smallBodyText),
                                     ),
                                   ),
                   ));

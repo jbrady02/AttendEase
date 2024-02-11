@@ -104,7 +104,7 @@ class Home extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // TODO: Make a different home page layout for mobile
     // This method is rerun every time setState is called
     return Scaffold(
       appBar: AppBar(
@@ -138,7 +138,7 @@ class Home extends State<MyHomePage> {
                                       backgroundColor:
                                           MaterialStateProperty.all(
                                               primaryColor)),
-                                  child: const Text('Take attendance',
+                                  child: const Text('Take attendance', // TODO: Implement
                                       style: bodyText),
                                 ),
                               )
@@ -172,7 +172,7 @@ class Home extends State<MyHomePage> {
                                           backgroundColor:
                                               MaterialStateProperty.all(
                                                   primaryColor)),
-                                      child: const Text('Edit class info',
+                                      child: const Text('Edit class info', // TODO: Implement
                                           style: bodyText),
                                     ),
                                   )),
@@ -184,14 +184,14 @@ class Home extends State<MyHomePage> {
         children: [
           FloatingActionButton(
             heroTag: 'addClass',
-            onPressed: _incrementCounter,
+            onPressed: _incrementCounter, // TODO: Implement
             backgroundColor: primaryColor,
             tooltip: 'Add a class',
             child: const Icon(Icons.add),
           ),
           const FloatingActionButton(
             heroTag: 'removeClass',
-            onPressed: null,
+            onPressed: null, // TODO: Implement
             backgroundColor: primaryColor,
             tooltip: 'Remove a class',
             child: Icon(Icons.remove),
@@ -200,7 +200,7 @@ class Home extends State<MyHomePage> {
             width: 200,
             child: FloatingActionButton(
               heroTag: 'viewAllStudents',
-              onPressed: null,
+              onPressed: null, // TODO: Implement
               backgroundColor: primaryColor,
               child: Text('View all students', style: bodyText),
             ),
