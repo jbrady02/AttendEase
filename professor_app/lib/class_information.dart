@@ -8,7 +8,7 @@ class ClassInformation extends StatelessWidget {
   final int classID;
   final String classInfo;
 
-  ClassInformation(this.classID, this.classInfo, {super.key});
+  const ClassInformation(this.classID, this.classInfo, {super.key});
 
   // Theme
   static const TextStyle bodyText = TextStyle(
@@ -28,6 +28,8 @@ class ClassInformation extends StatelessWidget {
   static const int absentUnexcused = 3;
   static const int tardyExcused = 4;
   static const int tardyUnexcused = 5;
+
+  // TODO: Get data from database
 
   static const Map<String, List<int>> students = {
     'Long String Name': [1, 2, 3, 4, 5],
@@ -112,7 +114,8 @@ class ClassInformation extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context, absentExcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] == absentExcused
+                child: students.values.toList()[nameIndex][dateIndex] ==
+                        absentExcused
                     ? const Text('Absent and excused (current value)',
                         style: bodyText)
                     : const Text('Absent and excused', style: bodyText),
@@ -124,7 +127,8 @@ class ClassInformation extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context, absentUnexcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] == absentUnexcused
+                child: students.values.toList()[nameIndex][dateIndex] ==
+                        absentUnexcused
                     ? const Text('Absent and unexcused (current value)',
                         style: bodyText)
                     : const Text('Absent and unexcused', style: bodyText),
@@ -136,7 +140,8 @@ class ClassInformation extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context, tardyExcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] == tardyExcused
+                child: students.values.toList()[nameIndex][dateIndex] ==
+                        tardyExcused
                     ? const Text('Tardy and excused (current value)',
                         style: bodyText)
                     : const Text('Tardy and excused', style: bodyText),
@@ -148,7 +153,8 @@ class ClassInformation extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context, tardyUnexcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] == tardyUnexcused
+                child: students.values.toList()[nameIndex][dateIndex] ==
+                        tardyUnexcused
                     ? const Text('Tardy and unexcused (current value)',
                         style: bodyText)
                     : const Text('Tardy and unexcused', style: bodyText),
@@ -166,7 +172,12 @@ class ClassInformation extends StatelessWidget {
         );
       },
     ).then((selectedValue) {
-      null;
+      // TODO: Update database attendance data
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ClassInformation(classID, classInfo)),
+      );
     });
   }
 
@@ -245,7 +256,7 @@ class ClassInformation extends StatelessWidget {
                                       // Set the background color
                                       child: Text(
                                           getAttendance(
-                                              // Get integer value in list from map
+                                              // Get attendance value
                                               students.values.toList()[
                                                       vicinity.yIndex - 1]
                                                   [vicinity.xIndex - 1]),
@@ -254,6 +265,13 @@ class ClassInformation extends StatelessWidget {
                                   ),
                   ));
             }),
+      ),
+      // TODO: Make button that turns all unknown data into absent unexcused
+      bottomNavigationBar: const FloatingActionButton(
+        heroTag: 'makeUnknownDataAbsentUnexcused',
+        onPressed: null, // TODO: Implement
+        backgroundColor: primaryColor,
+        child: Text('Make all unknown data absent unexcused', style: bodyText),
       ),
     );
   }
