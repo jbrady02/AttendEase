@@ -123,7 +123,8 @@ class Home extends State<MyHomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ClassInformation(classIndex,
+                        builder: (context) => ClassInformation(
+                            classIndex,
                             '${className[classIndex]} '
                             '${classMeetingDays[classIndex]} '
                             '${classMeetingTime[classIndex]}')),
@@ -143,7 +144,6 @@ class Home extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Make a different home page layout for mobile
     // This method is rerun every time setState is called
     return Scaffold(
       appBar: AppBar(
@@ -151,105 +151,109 @@ class Home extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: TwoDimensionalGridView(
-        diagonalDragBehavior: DiagonalDragBehavior.free,
-        // Different delegate for mobile and desktop
-        delegate: (Platform.isAndroid || Platform.isIOS)
-            ? TwoDimensionalChildBuilderDelegate(
-                maxXIndex: 0,
-                maxYIndex: className.length - 1,
-                builder: (BuildContext context, ChildVicinity vicinity) {
-                  return SizedBox(
-                    height: 100,
-                    child: Center(
-                        child: ElevatedButton(
-                      onPressed: () {
-                        _showSelectionDialog(context, vicinity.yIndex);
-                      },
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(primaryColor)),
-                      child: Text(
-                        '${className[vicinity.yIndex]} '
-                        '${classMeetingDays[vicinity.yIndex]} '
-                        '${classMeetingTime[vicinity.yIndex]}',
-                        style: bodyText,
-                        textAlign: TextAlign.center,
-                      ),
-                    )),
-                  );
-                })
-            : TwoDimensionalChildBuilderDelegate(
-                maxXIndex: 3,
-                maxYIndex: className.length - 1,
-                builder: (BuildContext context, ChildVicinity vicinity) {
-                  return SizedBox(
-                    height: 75,
-                    width: (vicinity.xIndex == 0) ? 400 : 600,
-                    child: Center(
-                        child: (vicinity.xIndex == 0)
-                            ? Center(
-                                child: Text(
-                                  '${className[vicinity.yIndex]} '
-                                  '${classMeetingDays[vicinity.yIndex]} '
-                                  '${classMeetingTime[vicinity.yIndex]}',
-                                  style: bodyText,
-                                  textAlign: TextAlign.center,
-                                ),
-                              )
-                            : (vicinity.xIndex == 1)
-                                ? SizedBox(
-                                    width: 197,
-                                    child: ElevatedButton(
-                                      onPressed: null,
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  primaryColor)),
-                                      child: const Text(
-                                          'Take attendance', // TODO: Implement
-                                          style: bodyText),
-                                    ),
-                                  )
-                                : (vicinity.xIndex == 2)
-                                    ? SizedBox(
-                                        width: 197,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ClassInformation(
-                                                          vicinity.yIndex,
-                                                          '${className[vicinity.yIndex]} '
-                                                          '${classMeetingDays[vicinity.yIndex]} '
-                                                          '${classMeetingTime[vicinity.yIndex]}')),
-                                            );
-                                          },
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all(
-                                                      primaryColor)),
-                                          child: const Text('View/edit data',
-                                              style: bodyText),
-                                        ),
-                                      )
-                                    : SizedBox(
-                                        width: 197,
-                                        child: ElevatedButton(
-                                          onPressed: null,
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all(
-                                                      primaryColor)),
-                                          child: const Text(
-                                              'Edit class info', // TODO: Implement
-                                              style: bodyText),
-                                        ),
-                                      )),
-                  );
-                }),
-      ),
+          diagonalDragBehavior: DiagonalDragBehavior.free,
+          // Different delegate for mobile and desktop
+          delegate: kIsWeb ||
+                  Platform.isWindows ||
+                  Platform.isLinux ||
+                  Platform.isMacOS ||
+                  Platform.isFuchsia
+              // Desktop layout
+              ? TwoDimensionalChildBuilderDelegate(
+                  maxXIndex: 3,
+                  maxYIndex: className.length - 1,
+                  builder: (BuildContext context, ChildVicinity vicinity) {
+                    return SizedBox(
+                      height: 75,
+                      width: (vicinity.xIndex == 0) ? 400 : 600,
+                      child: Center(
+                          child: (vicinity.xIndex == 0)
+                              ? Center(
+                                  child: Text(
+                                    '${className[vicinity.yIndex]} '
+                                    '${classMeetingDays[vicinity.yIndex]} '
+                                    '${classMeetingTime[vicinity.yIndex]}',
+                                    style: bodyText,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )
+                              : (vicinity.xIndex == 1)
+                                  ? SizedBox(
+                                      width: 197,
+                                      child: ElevatedButton(
+                                        onPressed: null,
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    primaryColor)),
+                                        child: const Text(
+                                            'Take attendance', // TODO: Implement
+                                            style: bodyText),
+                                      ),
+                                    )
+                                  : (vicinity.xIndex == 2)
+                                      ? SizedBox(
+                                          width: 197,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => ClassInformation(
+                                                        vicinity.yIndex,
+                                                        '${className[vicinity.yIndex]} '
+                                                        '${classMeetingDays[vicinity.yIndex]} '
+                                                        '${classMeetingTime[vicinity.yIndex]}')),
+                                              );
+                                            },
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all(
+                                                        primaryColor)),
+                                            child: const Text('View/edit data',
+                                                style: bodyText),
+                                          ),
+                                        )
+                                      : SizedBox(
+                                          width: 197,
+                                          child: ElevatedButton(
+                                            onPressed: null,
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all(
+                                                        primaryColor)),
+                                            child: const Text(
+                                                'Edit class info', // TODO: Implement
+                                                style: bodyText),
+                                          ),
+                                        )),
+                    );
+                  })
+              // Mobile layout
+              : TwoDimensionalChildBuilderDelegate(
+                  maxXIndex: 0,
+                  maxYIndex: className.length - 1,
+                  builder: (BuildContext context, ChildVicinity vicinity) {
+                    return SizedBox(
+                      height: 100,
+                      child: Center(
+                          child: ElevatedButton(
+                        onPressed: () {
+                          _showSelectionDialog(context, vicinity.yIndex);
+                        },
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(primaryColor)),
+                        child: Text(
+                          '${className[vicinity.yIndex]} '
+                          '${classMeetingDays[vicinity.yIndex]} '
+                          '${classMeetingTime[vicinity.yIndex]}',
+                          style: bodyText,
+                          textAlign: TextAlign.center,
+                        ),
+                      )),
+                    );
+                  })),
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
