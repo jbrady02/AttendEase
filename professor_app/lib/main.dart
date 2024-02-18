@@ -5,9 +5,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'class_information.dart';
+import 'database_helper.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+void _onButtonPressed() async {
+  DatabaseHelper dbHelper = DatabaseHelper();
+  dbHelper.connectToDatabase();
 }
 
 class MyApp extends StatelessWidget {
@@ -133,6 +139,7 @@ class Home extends State<MyHomePage> {
                 child: const Text('View/edit data', style: bodyText)),
             SimpleDialogOption(
                 onPressed: () {
+                  _onButtonPressed();
                   Navigator.pop(context);
                 },
                 child: const Text('Edit class info', style: bodyText)),
@@ -217,7 +224,9 @@ class Home extends State<MyHomePage> {
                                       : SizedBox(
                                           width: 197,
                                           child: ElevatedButton(
-                                            onPressed: null,
+                                            onPressed: () {
+                                              _onButtonPressed();
+                                            },
                                             style: ButtonStyle(
                                                 backgroundColor:
                                                     MaterialStateProperty.all(
