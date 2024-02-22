@@ -1,20 +1,44 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:postgres/postgres.dart';
 
 class DatabaseHelper {
-  void connectToDatabase() async {
+  Future<Connection> connectToDatabase() async {
     final conn = await Connection.open(
       Endpoint(
-        host: '10.0.2.2', // Android localhost
+        host: kIsWeb ||
+                Platform.isWindows ||
+                Platform.isLinux ||
+                Platform.isMacOS ||
+                Platform.isFuchsia
+            ? 'localhost'
+            : '10.0.2.2', // Android localhost
         database: 'postgres',
         port: 5432,
         username: 'postgres',
-        password: '', // Insert password here
+        password: getPassword(), // Insert password here
       ),
       // The postgres server hosted locally doesn't have SSL by default. If you're
       // accessing a postgres server over the Internet, the server should support
       // SSL and you should swap out the mode with `SslMode.verifyFull`.
       settings: const ConnectionSettings(sslMode: SslMode.disable),
     );
+
+    return conn;
+  }
+
+  String getPassword() {
+    File file = File('${Directory.current.path}\\lib\\password.txt');
+    if (file.existsSync()) {
+      return file.readAsStringSync();
+    } else {
+      return 'Password not found';
+    }
+  }
+
+  void sampleDatabase() async {
+    Connection conn = await connectToDatabase();
 
     // Simple query without results
     await conn.execute('CREATE TABLE IF NOT EXISTS a_table ('

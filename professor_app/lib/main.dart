@@ -13,7 +13,7 @@ void main() {
 
 void _onButtonPressed() async {
   DatabaseHelper dbHelper = DatabaseHelper();
-  dbHelper.connectToDatabase();
+  dbHelper.sampleDatabase();
 }
 
 class MyApp extends StatelessWidget {
