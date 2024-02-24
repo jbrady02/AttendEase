@@ -4,16 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:postgres/postgres.dart';
 import 'class_information.dart';
 import 'database_helper.dart';
 
 void main() {
   runApp(const MyApp());
-}
-
-void _onButtonPressed() async {
-  DatabaseHelper dbHelper = DatabaseHelper();
-  dbHelper.sampleDatabase();
 }
 
 class MyApp extends StatelessWidget {
@@ -50,20 +46,10 @@ class Home extends State<MyHomePage> {
   );
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
 
-  static const List<int> classID = [0, 1, 2, 3];
-  static const List<String> className = [
-    'Class name 1',
-    'Class name 2',
-    'Class name 3',
-    'Class name 4'
-  ];
-  static const List<String> classMeetingDays = ['MWF', 'TR', 'F', 'MWF'];
-  static const List<String> classMeetingTime = [
-    '8:30-9:35',
-    '12:20-2:00',
-    '12:20-3:20',
-    '12:15-1:20'
-  ];
+  int refreshTimer = 0;
+
+  List<int> classID = [];
+  List<String> classInfo = [];
 
   void _sample() {
     setState(() {
@@ -116,7 +102,7 @@ class Home extends State<MyHomePage> {
       builder: (BuildContext context) {
         return SimpleDialog(
           title: Text(
-            '${className[classIndex]} ${classMeetingDays[classIndex]} ${classMeetingTime[classIndex]}',
+            classInfo[classIndex],
           ),
           children: [
             SimpleDialogOption(
@@ -130,16 +116,12 @@ class Home extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ClassInformation(
-                            classIndex,
-                            '${className[classIndex]} '
-                            '${classMeetingDays[classIndex]} '
-                            '${classMeetingTime[classIndex]}')),
+                            classIndex, classInfo[classIndex])),
                   );
                 },
                 child: const Text('View/edit data', style: bodyText)),
             SimpleDialogOption(
                 onPressed: () {
-                  _onButtonPressed();
                   Navigator.pop(context);
                 },
                 child: const Text('Edit class info', style: bodyText)),
@@ -149,153 +131,264 @@ class Home extends State<MyHomePage> {
     );
   }
 
+  void getClassList() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    dbHelper.getClasses().then((classList) {
+      for (int index = 0; index < classList.length; index++) {
+        classID.add(int.parse(classList[index][0].toString()));
+        classInfo.add('${classList[index][1]} ${classList[index][2]}');
+      }
+    });
+  }
+
+  // This method is rerun every time setState is called
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        title: Text(widget.title),
-      ),
-      body: TwoDimensionalGridView(
-          diagonalDragBehavior: DiagonalDragBehavior.free,
-          // Different delegate for mobile and desktop
-          delegate: kIsWeb ||
-                  Platform.isWindows ||
-                  Platform.isLinux ||
-                  Platform.isMacOS ||
-                  Platform.isFuchsia
-              // Desktop layout
-              ? TwoDimensionalChildBuilderDelegate(
-                  maxXIndex: 3,
-                  maxYIndex: className.length - 1,
-                  builder: (BuildContext context, ChildVicinity vicinity) {
-                    return SizedBox(
-                      height: 75,
-                      width: (vicinity.xIndex == 0) ? 400 : 600,
-                      child: Center(
-                          child: (vicinity.xIndex == 0)
-                              ? Center(
-                                  child: Text(
-                                    '${className[vicinity.yIndex]} '
-                                    '${classMeetingDays[vicinity.yIndex]} '
-                                    '${classMeetingTime[vicinity.yIndex]}',
-                                    style: bodyText,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                )
-                              : (vicinity.xIndex == 1)
-                                  ? SizedBox(
-                                      width: 197,
-                                      child: ElevatedButton(
-                                        onPressed: null,
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                                    primaryColor)),
-                                        child: const Text(
-                                            'Take attendance', // TODO: Implement
-                                            style: bodyText),
-                                      ),
-                                    )
-                                  : (vicinity.xIndex == 2)
-                                      ? SizedBox(
-                                          width: 197,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => ClassInformation(
-                                                        vicinity.yIndex,
-                                                        '${className[vicinity.yIndex]} '
-                                                        '${classMeetingDays[vicinity.yIndex]} '
-                                                        '${classMeetingTime[vicinity.yIndex]}')),
-                                              );
-                                            },
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all(
-                                                        primaryColor)),
-                                            child: const Text('View/edit data',
-                                                style: bodyText),
-                                          ),
-                                        )
-                                      : SizedBox(
-                                          width: 197,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              _onButtonPressed();
-                                            },
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all(
-                                                        primaryColor)),
-                                            child: const Text(
-                                                'Edit class info', // TODO: Implement
-                                                style: bodyText),
-                                          ),
-                                        )),
-                    );
-                  })
-              // Mobile layout
-              : TwoDimensionalChildBuilderDelegate(
-                  maxXIndex: 0,
-                  maxYIndex: className.length - 1,
-                  builder: (BuildContext context, ChildVicinity vicinity) {
-                    return SizedBox(
-                      height: 100,
-                      child: Center(
-                          child: ElevatedButton(
-                        onPressed: () {
-                          _showSelectionDialog(context, vicinity.yIndex);
-                        },
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(primaryColor)),
-                        child: Text(
-                          '${className[vicinity.yIndex]} '
-                          '${classMeetingDays[vicinity.yIndex]} '
-                          '${classMeetingTime[vicinity.yIndex]}',
-                          style: bodyText,
-                          textAlign: TextAlign.center,
-                        ),
-                      )),
-                    );
-                  })),
-      bottomNavigationBar: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          FloatingActionButton(
-            heroTag: 'addClass',
-            onPressed: _sample, // TODO: Implement
-            backgroundColor: primaryColor,
-            tooltip: 'Add a class',
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(
-            width: 200,
-            child: FloatingActionButton(
-              heroTag: 'viewAllStudents',
-              onPressed: null, // TODO: Implement
+    getClassList();
+    if (refreshTimer < 3 && classID.isEmpty) {
+      // Slowly increase the time between refreshes until an error appears
+      switch (refreshTimer) {
+        case 0:
+          Future.delayed(const Duration(milliseconds: 500), () {
+            setState(() {
+              refreshTimer++;
+            });
+          });
+        case 1:
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            setState(() {
+              refreshTimer++;
+            });
+          });
+        default:
+          Future.delayed(const Duration(milliseconds: 2000), () {
+            setState(() {
+              refreshTimer++;
+            });
+          });
+      }
+    } else if (refreshTimer >= 3 && classID.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          title: Text(widget.title),
+        ),
+        body: const Center(
+            child: Text(
+          'No classes found. Please add a class or refresh the page.',
+          style: bodyText,
+          textAlign: TextAlign.center,
+        )),
+        bottomNavigationBar: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            FloatingActionButton(
+              heroTag: 'addClass',
+              onPressed: _sample, // TODO: Implement
               backgroundColor: primaryColor,
-              child: Text('View all students', style: bodyText),
+              tooltip: 'Add a class',
+              child: const Icon(Icons.add),
             ),
-          ),
-          SizedBox(
-            width: 100,
-            child: FloatingActionButton(
-              heroTag: 'license',
+            FloatingActionButton(
+              heroTag: 'refresh',
               onPressed: () {
-                showAboutDialog(context: context, applicationVersion: '0.0.0');
-              },
+                setState(() {
+                  classID = [];
+                  classInfo = [];
+                  refreshTimer = 0;
+                });
+                // Give extra time to clear existing data
+              }, // TODO: Implement
               backgroundColor: primaryColor,
-              child: const Text('About', style: bodyText),
+              tooltip: 'Refresh page',
+              child: const Icon(Icons.refresh),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(
+              width: 130,
+              child: FloatingActionButton(
+                heroTag: 'viewAllStudents',
+                onPressed: null, // TODO: Implement
+                backgroundColor: primaryColor,
+                child: Text('Students', style: bodyText),
+              ),
+            ),
+            SizedBox(
+              width: 100,
+              child: FloatingActionButton(
+                heroTag: 'license',
+                onPressed: () {
+                  showAboutDialog(
+                      context: context, applicationVersion: '0.0.0');
+                },
+                backgroundColor: primaryColor,
+                child: const Text('About', style: bodyText),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return classID.isEmpty
+        ? const Center(child: CircularProgressIndicator())
+        : Scaffold(
+            appBar: AppBar(
+              backgroundColor: primaryColor,
+              title: Text(widget.title),
+            ),
+            body: TwoDimensionalGridView(
+                diagonalDragBehavior: DiagonalDragBehavior.free,
+                // Different delegate for mobile and desktop
+                delegate: kIsWeb ||
+                        Platform.isWindows ||
+                        Platform.isLinux ||
+                        Platform.isMacOS ||
+                        Platform.isFuchsia
+                    // Desktop layout
+                    ? TwoDimensionalChildBuilderDelegate(
+                        maxXIndex: 3,
+                        maxYIndex: classInfo.length - 1,
+                        builder:
+                            (BuildContext context, ChildVicinity vicinity) {
+                          return SizedBox(
+                            height: 75,
+                            width: (vicinity.xIndex == 0) ? 400 : 600,
+                            child: Center(
+                                child: (vicinity.xIndex == 0)
+                                    ? Center(
+                                        child: Text(
+                                          classInfo[vicinity.yIndex],
+                                          style: bodyText,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )
+                                    : (vicinity.xIndex == 1)
+                                        ? SizedBox(
+                                            width: 197,
+                                            child: ElevatedButton(
+                                              onPressed: null,
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all(
+                                                          primaryColor)),
+                                              child: const Text(
+                                                  'Take attendance', // TODO: Implement
+                                                  style: bodyText),
+                                            ),
+                                          )
+                                        : (vicinity.xIndex == 2)
+                                            ? SizedBox(
+                                                width: 197,
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ClassInformation(
+                                                                  classID[vicinity
+                                                                      .yIndex],
+                                                                  classInfo[vicinity
+                                                                      .yIndex])),
+                                                    );
+                                                  },
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(
+                                                                  primaryColor)),
+                                                  child: const Text(
+                                                      'View/edit data',
+                                                      style: bodyText),
+                                                ),
+                                              )
+                                            : SizedBox(
+                                                width: 197,
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                  },
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(
+                                                                  primaryColor)),
+                                                  child: const Text(
+                                                      'Edit class info', // TODO: Implement
+                                                      style: bodyText),
+                                                ),
+                                              )),
+                          );
+                        })
+                    // Mobile layout
+                    : TwoDimensionalChildBuilderDelegate(
+                        maxXIndex: 0,
+                        maxYIndex: classInfo.length - 1,
+                        builder:
+                            (BuildContext context, ChildVicinity vicinity) {
+                          return SizedBox(
+                            height: 100,
+                            child: Center(
+                                child: ElevatedButton(
+                              onPressed: () {
+                                _showSelectionDialog(context, vicinity.yIndex);
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(primaryColor)),
+                              child: Text(
+                                classInfo[vicinity.yIndex],
+                                style: bodyText,
+                                textAlign: TextAlign.center,
+                              ),
+                            )),
+                          );
+                        })),
+            bottomNavigationBar: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton(
+                  heroTag: 'addClass',
+                  onPressed: _sample, // TODO: Implement
+                  backgroundColor: primaryColor,
+                  tooltip: 'Add a class',
+                  child: const Icon(Icons.add),
+                ),
+                FloatingActionButton(
+                  heroTag: 'refresh',
+                  onPressed: () {
+                    setState(() {
+                      classID = [];
+                      classInfo = [];
+                      refreshTimer = 0;
+                    });
+                  },
+                  backgroundColor: primaryColor,
+                  tooltip: 'Refresh page',
+                  child: const Icon(Icons.refresh),
+                ),
+                const SizedBox(
+                  width: 130,
+                  child: FloatingActionButton(
+                    heroTag: 'viewAllStudents',
+                    onPressed: null, // TODO: Implement
+                    backgroundColor: primaryColor,
+                    child: Text('Students', style: bodyText),
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: FloatingActionButton(
+                    heroTag: 'license',
+                    onPressed: () {
+                      showAboutDialog(
+                          context: context, applicationVersion: '0.0.0');
+                    },
+                    backgroundColor: primaryColor,
+                    child: const Text('About', style: bodyText),
+                  ),
+                ),
+              ],
+            ),
+          );
   }
 }
 

@@ -37,6 +37,18 @@ class DatabaseHelper {
     }
   }
 
+  Future<Result> getClasses() async {
+    Connection conn = await connectToDatabase();
+    await conn.execute('CREATE TABLE IF NOT EXISTS CLASSES ('
+        'ClassID SERIAL PRIMARY KEY,'
+        'ClassName VARCHAR(255) NOT NULL,'
+        'MeetingDateTime VARCHAR(255) NOT NULL'
+        ');');
+
+    final results = await conn.execute('SELECT * FROM CLASSES');
+    return results;
+  }
+
   void sampleDatabase() async {
     Connection conn = await connectToDatabase();
 
