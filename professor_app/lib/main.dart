@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:postgres/postgres.dart';
 import 'class_information.dart';
 import 'database_helper.dart';
 
@@ -96,14 +95,101 @@ class Home extends State<MyHomePage> {
     );
   }
 
+  void addClassDialog(BuildContext context) {
+    var classNameTextField = TextEditingController();
+    var classDataTimeTextField = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Add a class', textAlign: TextAlign.center),
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: 250,
+                  child: TextField(
+                    controller: classNameTextField,
+                    maxLength: 63,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Class name',
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: 250,
+                  child: TextField(
+                    controller: classDataTimeTextField,
+                    maxLength: 63,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Class date and time',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 75,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: OutlinedButton(
+                      onPressed: () {
+                        if (classNameTextField.text.isNotEmpty &&
+                            classDataTimeTextField.text.isNotEmpty) {
+                          Navigator.pop(context);
+                          DatabaseHelper dbHelper = DatabaseHelper();
+                          dbHelper.addClass(classNameTextField.text,
+                              classDataTimeTextField.text);
+                          setState(() {
+                            // TODO: When edit class info is implemented, go to that page upon creation
+                            classID = [];
+                            classInfo = [];
+                            refreshTimer = -1;
+                          });
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                      'You must fill out both fields.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              });
+                        }
+                      },
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.green)),
+                      child: const Text('Add class', style: bodyText)),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
+  // Mobile device class action selection dialog
   void _showSelectionDialog(BuildContext context, int classIndex) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text(
-            classInfo[classIndex],
-          ),
+          title: Text(classInfo[classIndex]),
           children: [
             SimpleDialogOption(
                 onPressed: () {
@@ -131,6 +217,7 @@ class Home extends State<MyHomePage> {
     );
   }
 
+  // Get Classes
   void getClassList() async {
     DatabaseHelper dbHelper = DatabaseHelper();
     dbHelper.getClasses().then((classList) {
@@ -144,30 +231,19 @@ class Home extends State<MyHomePage> {
   // This method is rerun every time setState is called
   @override
   Widget build(BuildContext context) {
-    getClassList();
-    if (refreshTimer < 3 && classID.isEmpty) {
-      // Slowly increase the time between refreshes until an error appears
-      switch (refreshTimer) {
-        case 0:
-          Future.delayed(const Duration(milliseconds: 500), () {
-            setState(() {
-              refreshTimer++;
-            });
-          });
-        case 1:
-          Future.delayed(const Duration(milliseconds: 1000), () {
-            setState(() {
-              refreshTimer++;
-            });
-          });
-        default:
-          Future.delayed(const Duration(milliseconds: 2000), () {
-            setState(() {
-              refreshTimer++;
-            });
-          });
-      }
-    } else if (refreshTimer >= 3 && classID.isEmpty) {
+    if (refreshTimer == 0) {
+      // Get class information once
+      getClassList();
+    }
+    if (refreshTimer < 30 && classID.isEmpty) {
+      // Wait for class information
+      Future.delayed(const Duration(milliseconds: 100), () {
+        setState(() {
+          refreshTimer++;
+        });
+      });
+    } else if (refreshTimer >= 30 && classID.isEmpty) {
+      // If class information is not found after waiting display message
       return Scaffold(
         appBar: AppBar(
           backgroundColor: primaryColor,
@@ -184,7 +260,9 @@ class Home extends State<MyHomePage> {
           children: [
             FloatingActionButton(
               heroTag: 'addClass',
-              onPressed: _sample, // TODO: Implement
+              onPressed: () {
+                addClassDialog(context);
+              },
               backgroundColor: primaryColor,
               tooltip: 'Add a class',
               child: const Icon(Icons.add),
@@ -197,7 +275,6 @@ class Home extends State<MyHomePage> {
                   classInfo = [];
                   refreshTimer = 0;
                 });
-                // Give extra time to clear existing data
               }, // TODO: Implement
               backgroundColor: primaryColor,
               tooltip: 'Refresh page',
@@ -229,7 +306,26 @@ class Home extends State<MyHomePage> {
       );
     }
     return classID.isEmpty
-        ? const Center(child: CircularProgressIndicator())
+        ? Scaffold(
+            // If class information is being loaded display loading screen
+            appBar: AppBar(
+              backgroundColor: primaryColor,
+              title: Text(widget.title),
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+            bottomNavigationBar: SizedBox(
+              width: 100,
+              child: FloatingActionButton(
+                heroTag: 'license',
+                onPressed: () {
+                  showAboutDialog(
+                      context: context, applicationVersion: '0.0.0');
+                },
+                backgroundColor: primaryColor,
+                child: const Text('About', style: bodyText),
+              ),
+            ),
+          )
         : Scaffold(
             appBar: AppBar(
               backgroundColor: primaryColor,
@@ -304,8 +400,7 @@ class Home extends State<MyHomePage> {
                                             : SizedBox(
                                                 width: 197,
                                                 child: ElevatedButton(
-                                                  onPressed: () {
-                                                  },
+                                                  onPressed: () {},
                                                   style: ButtonStyle(
                                                       backgroundColor:
                                                           MaterialStateProperty
@@ -347,7 +442,9 @@ class Home extends State<MyHomePage> {
               children: [
                 FloatingActionButton(
                   heroTag: 'addClass',
-                  onPressed: _sample, // TODO: Implement
+                  onPressed: () {
+                    addClassDialog(context);
+                  },
                   backgroundColor: primaryColor,
                   tooltip: 'Add a class',
                   child: const Icon(Icons.add),

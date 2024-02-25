@@ -24,7 +24,6 @@ class DatabaseHelper {
       // SSL and you should swap out the mode with `SslMode.verifyFull`.
       settings: const ConnectionSettings(sslMode: SslMode.disable),
     );
-
     return conn;
   }
 
@@ -39,14 +38,23 @@ class DatabaseHelper {
 
   Future<Result> getClasses() async {
     Connection conn = await connectToDatabase();
-    await conn.execute('CREATE TABLE IF NOT EXISTS CLASSES ('
+    await conn.execute('CREATE TABLE IF NOT EXISTS Classes ('
         'ClassID SERIAL PRIMARY KEY,'
-        'ClassName VARCHAR(255) NOT NULL,'
-        'MeetingDateTime VARCHAR(255) NOT NULL'
+        'ClassName VARCHAR NOT NULL,'
+        'ClassDateTime VARCHAR NOT NULL'
         ');');
 
-    final results = await conn.execute('SELECT * FROM CLASSES');
+    final results = await conn.execute('SELECT * FROM Classes');
+    conn.close();
     return results;
+  }
+
+  void addClass(String className, String classDateTime) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute(
+      'INSERT INTO Classes (ClassName, ClassDateTime) VALUES (\$1, \$2)',
+      parameters: [className, classDateTime],
+    );
   }
 
   void sampleDatabase() async {

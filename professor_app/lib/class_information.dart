@@ -46,6 +46,7 @@ class ClassInformation extends StatelessWidget {
     '2023-07-09',
   ];
 
+  // Convert the database integer values to strings
   String getAttendance(int attendanceInt) {
     switch (attendanceInt) {
       case present:
