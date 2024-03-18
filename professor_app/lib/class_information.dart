@@ -47,7 +47,7 @@ class ClassInformation extends StatelessWidget {
   ];
 
   // Convert the database integer values to strings
-  String getAttendance(int attendanceInt) {
+  String _getAttendance(int attendanceInt) {
     switch (attendanceInt) {
       case present:
         return 'P';
@@ -64,7 +64,7 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
-  Color getColor(int attendanceInt) {
+  Color _getColor(int attendanceInt) {
     switch (attendanceInt) {
       case present:
         return Colors.green;
@@ -77,7 +77,7 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
-  Color getOutlineColor(int attendanceInt) {
+  Color _getOutlineColor(int attendanceInt) {
     switch (attendanceInt) {
       case absentUnexcused || tardyUnexcused:
         return Colors.red;
@@ -96,7 +96,7 @@ class ClassInformation extends StatelessWidget {
         return SimpleDialog(
           title: Text('Edit attendance data for '
               '${students.keys.toList()[nameIndex]} '
-              'on ${classSessions[dateIndex]}:'),
+              'on ${classSessions[dateIndex]}'),
           children: [
             Container(
               color: Colors.green,
@@ -245,18 +245,18 @@ class ClassInformation extends StatelessWidget {
                                       },
                                       style: OutlinedButton.styleFrom(
                                           side: BorderSide(
-                                              color: getOutlineColor(
+                                              color: _getOutlineColor(
                                                   students.values.toList()[
                                                           vicinity.yIndex - 1]
                                                       [vicinity.xIndex - 1]),
                                               width: 3), // Set the border color
-                                          backgroundColor: getColor(students
+                                          backgroundColor: _getColor(students
                                                   .values
                                                   .toList()[vicinity.yIndex - 1]
                                               [vicinity.xIndex - 1])),
                                       // Set the background color
                                       child: Text(
-                                          getAttendance(
+                                          _getAttendance(
                                               // Get attendance value
                                               students.values.toList()[
                                                       vicinity.yIndex - 1]

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:postgres/postgres.dart';
+import 'package:professor_app/student.dart';
 
 class DatabaseHelper {
   Future<Connection> connectToDatabase() async {
@@ -17,7 +18,7 @@ class DatabaseHelper {
         database: 'postgres',
         port: 5432,
         username: 'postgres',
-        password: getPassword(), // Insert password here
+        password: '5a&G4s3?=r?soj)C', // Insert password here
       ),
       // The postgres server hosted locally doesn't have SSL by default. If you're
       // accessing a postgres server over the Internet, the server should support
@@ -27,6 +28,7 @@ class DatabaseHelper {
     return conn;
   }
 
+  // Get the password from a file
   String getPassword() {
     File file = File('${Directory.current.path}\\lib\\password.txt');
     if (file.existsSync()) {
@@ -36,81 +38,96 @@ class DatabaseHelper {
     }
   }
 
+  // Create Classes table if it does not exist, then return the table
   Future<Result> getClasses() async {
     Connection conn = await connectToDatabase();
-    await conn.execute('CREATE TABLE IF NOT EXISTS Classes ('
-        'ClassID SERIAL PRIMARY KEY,'
-        'ClassName VARCHAR NOT NULL,'
-        'ClassDateTime VARCHAR NOT NULL'
+    await conn.execute('CREATE TABLE IF NOT EXISTS classes ('
+        'class_id SERIAL PRIMARY KEY,'
+        'class_name VARCHAR NOT NULL,'
+        'class_date_time VARCHAR NOT NULL'
         ');');
 
-    final results = await conn.execute('SELECT * FROM Classes');
+    final results = await conn.execute('SELECT * FROM classes');
     conn.close();
     return results;
   }
 
+  // Add a class to the Classes table
   void addClass(String className, String classDateTime) async {
     Connection conn = await connectToDatabase();
     await conn.execute(
-      'INSERT INTO Classes (ClassName, ClassDateTime) VALUES (\$1, \$2)',
+      'INSERT INTO classes (class_name, class_date_time) VALUES (\$1, \$2)',
       parameters: [className, classDateTime],
     );
   }
 
-  void sampleDatabase() async {
+  // Create Students table if it does not exist, then return the table
+  Future<List<Student>> getStudents() async {
     Connection conn = await connectToDatabase();
+    await conn.execute('CREATE TABLE IF NOT EXISTS students ('
+        'student_id SERIAL PRIMARY KEY,'
+        'given_name VARCHAR,'
+        'Surname VARCHAR,'
+        'custom_field_1 VARCHAR,'
+        'custom_field_2 VARCHAR,'
+        'custom_field_3 VARCHAR,'
+        'custom_field_4 VARCHAR'
+        ');');
 
-    // Simple query without results
-    await conn.execute('CREATE TABLE IF NOT EXISTS a_table ('
-        '  id TEXT NOT NULL, '
-        '  totals INTEGER NOT NULL DEFAULT 0'
-        ')');
+    // Insert student that is used only for the custom field names
+    await conn.execute('''INSERT INTO students (student_id, given_name, 
+      surname, custom_field_1, custom_field_2, custom_field_3, 
+      custom_field_4) VALUES (0, 'Given name', 'Surname', 'Custom field 1', 
+      'Custom field 2', 'Custom field 3', 'Custom field 4') 
+      ON CONFLICT (student_id) DO NOTHING;''');
 
-    // simple query
-    final result0 = await conn.execute("SELECT 'foo'");
-    print(result0[0][0]); // first row, first column
+    final results =
+        await conn.execute('SELECT * FROM students ORDER BY surname ASC');
+    conn.close();
+    return results
+        .map((row) => Student(
+            row[0] as int,
+            row[1] as String,
+            row[2] as String,
+            row[3] as String,
+            row[4] as String,
+            row[5] as String,
+            row[6] as String))
+        .toList();
+  }
 
-    // Using prepared statements to supply values
-    final result1 = await conn.execute(
-      r'INSERT INTO a_table (id) VALUES ($1)',
-      parameters: ['example row'],
+  // Add a student to the Students table
+  void addStudent(String givenName, String surname, String customField1,
+      String customField2, String customField3, String customField4) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute(
+      'INSERT INTO students (given_name, surname, custom_field_1, custom_field_2, custom_field_3, custom_field_4) VALUES (\$1, \$2, \$3, \$4, \$5, \$6)',
+      parameters: [
+        givenName,
+        surname,
+        customField1,
+        customField2,
+        customField3,
+        customField4
+      ],
     );
-    print('Inserted ${result1.affectedRows} rows');
+  }
 
-    // name parameter query
-    final result2 = await conn.execute(
-      Sql.named('SELECT * FROM a_table WHERE id=@id'),
-      parameters: {'id': 'example row'},
+  // Remove a student from the Students table
+  void removeStudent(int studentId) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute(
+      'DELETE FROM students WHERE student_id = \$1',
+      parameters: [studentId],
     );
-    print(result2.first.toColumnMap());
+  }
 
-    // transaction
-    await conn.runTx((s) async {
-      final rs = await s.execute('SELECT count(*) FROM a_table');
-      await s.execute(
-        r'UPDATE a_table SET totals=$1 WHERE id=$2',
-        parameters: [rs[0][0], 'xyz'],
-      );
-    });
-
-    // prepared statement
-    final statement = await conn.prepare(Sql("SELECT 'foo';"));
-    final result3 = await statement.run([]);
-    print(result3);
-    await statement.dispose();
-
-    // preared statement with types
-    final anotherStatement =
-        await conn.prepare(Sql(r'SELECT $1;', types: [Type.bigInteger]));
-    final bound = anotherStatement.bind([1]);
-    final subscription = bound.listen((row) {
-      print('row: $row');
-    });
-    await subscription.asFuture();
-    await subscription.cancel();
-    print(await subscription.affectedRows);
-    print(await subscription.schema);
-
-    await conn.close();
+  // Update a student in the Students table
+  void editStudent(String field, String value, int studentId) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute(
+      'UPDATE students SET $field = \$1 WHERE student_id = \$2',
+      parameters: [value, studentId],
+    );
   }
 }
