@@ -43,21 +43,20 @@ class DatabaseHelper {
     Connection conn = await connectToDatabase();
     await conn.execute('CREATE TABLE IF NOT EXISTS classes ('
         'class_id SERIAL PRIMARY KEY,'
-        'class_name VARCHAR NOT NULL,'
-        'class_date_time VARCHAR NOT NULL'
+        'class_name VARCHAR NOT NULL'
         ');');
 
-    final results = await conn.execute('SELECT * FROM classes');
+    final results = await conn.execute('SELECT * FROM classes ORDER BY class_name ASC');
     conn.close();
     return results;
   }
 
   // Add a class to the Classes table
-  void addClass(String className, String classDateTime) async {
+  void addClass(String className) async {
     Connection conn = await connectToDatabase();
     await conn.execute(
-      'INSERT INTO classes (class_name, class_date_time) VALUES (\$1, \$2)',
-      parameters: [className, classDateTime],
+      'INSERT INTO classes (class_name) VALUES (\$1)',
+      parameters: [className],
     );
   }
 

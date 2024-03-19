@@ -134,12 +134,13 @@ class Home extends State<MyHomePage> {
                             classDataTimeTextField.text.isNotEmpty) {
                           Navigator.pop(context);
                           DatabaseHelper dbHelper = DatabaseHelper();
-                          dbHelper.addClass(classNameTextField.text,
-                              classDataTimeTextField.text);
-                          setState(() {
-                            // TODO: When edit class info is implemented, go to that page upon creation
-                            classID = [];
-                            classInfo = [];
+                          dbHelper.addClass('${classNameTextField.text} ${classDataTimeTextField.text}');
+                          // Wait 250 ms for the database to update
+                          Future.delayed(const Duration(milliseconds: 250), () {
+                            setState(() {
+                              classID = [];
+                              classInfo = [];
+                            });
                           });
                         } else {
                           showDialog(
@@ -208,7 +209,7 @@ class Home extends State<MyHomePage> {
   void _addClassesToLists(List<dynamic> classes) {
     for (var i = 0; i < classes.length; i++) {
       classID.add(classes[i][0]);
-      classInfo.add(classes[i][1] + ' ' + classes[i][2]);
+      classInfo.add(classes[i][1]);
     }
   }
 
