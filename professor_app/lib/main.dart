@@ -5,6 +5,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:postgres/postgres.dart';
+import 'package:professor_app/edit_class_add_student.dart';
+import 'package:professor_app/edit_class_remove_student.dart';
 import 'class_information.dart';
 import 'database_helper.dart';
 import 'view_students.dart';
@@ -39,6 +41,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => Home();
 }
 
+/// State class for the main page.
 class Home extends State<MyHomePage> {
   // Theme
   static const TextStyle bodyText = TextStyle(
@@ -48,8 +51,9 @@ class Home extends State<MyHomePage> {
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
 
   List<int> classID = [];
-  List<String> classInfo = [];
+  List<String> className = [];
 
+  /// Display app information and licenses.
   void _showAboutDialog({
     required BuildContext context,
     String? applicationName,
@@ -84,9 +88,9 @@ class Home extends State<MyHomePage> {
     );
   }
 
+  /// Dialog to add a class to the classes table.
   void _addClassDialog(BuildContext context) {
     var classNameTextField = TextEditingController();
-    var classDataTimeTextField = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -100,25 +104,13 @@ class Home extends State<MyHomePage> {
                   width: 200,
                   child: TextField(
                     controller: classNameTextField,
-                    maxLength: 63,
+                    maxLength: 100,
+                    minLines: 1,
+                    maxLines: 10,
+                    keyboardType: TextInputType.text,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Class name',
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: SizedBox(
-                  width: 200,
-                  child: TextField(
-                    controller: classDataTimeTextField,
-                    maxLength: 63,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Class date and time',
+                      labelText: 'Class name and time',
                     ),
                   ),
                 ),
@@ -130,16 +122,16 @@ class Home extends State<MyHomePage> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: OutlinedButton(
                       onPressed: () {
-                        if (classNameTextField.text.isNotEmpty &&
-                            classDataTimeTextField.text.isNotEmpty) {
+                        if (classNameTextField.text.isNotEmpty) {
                           Navigator.pop(context);
                           DatabaseHelper dbHelper = DatabaseHelper();
-                          dbHelper.addClass('${classNameTextField.text} ${classDataTimeTextField.text}');
+                          dbHelper.addClass(
+                              classNameTextField.text.replaceAll('\n', ''));
                           // Wait 250 ms for the database to update
                           Future.delayed(const Duration(milliseconds: 250), () {
                             setState(() {
                               classID = [];
-                              classInfo = [];
+                              className = [];
                             });
                           });
                         } else {
@@ -147,8 +139,8 @@ class Home extends State<MyHomePage> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: const Text(
-                                      'You must fill out both fields.'),
+                                  title:
+                                      const Text('The value can not be empty.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -172,13 +164,15 @@ class Home extends State<MyHomePage> {
         });
   }
 
-  // Mobile device class action selection dialog
+  /// Mobile device class action selection dialog.
+  /// 
+  /// [classIndex] is the class index in the className and classID lists.
   void _showSelectionDialog(BuildContext context, int classIndex) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text(classInfo[classIndex]),
+          title: Text(className[classIndex]),
           children: [
             SimpleDialogOption(
                 onPressed: () {
@@ -191,13 +185,13 @@ class Home extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ClassInformation(
-                            classIndex, classInfo[classIndex])),
+                            classIndex, className[classIndex])),
                   );
                 },
                 child: const Text('View/edit data', style: bodyText)),
             SimpleDialogOption(
                 onPressed: () {
-                  Navigator.pop(context);
+                  _editClassDialog(classID[classIndex], className[classIndex]);
                 },
                 child: const Text('Edit class info', style: bodyText)),
           ],
@@ -206,20 +200,213 @@ class Home extends State<MyHomePage> {
     );
   }
 
+  /// Dialog to edit a class in the classes table.
+  /// 
+  /// [editClassID] is the class_id of the class to be edited.
+  /// [editClassName] is the name of the class to be edited.
+  void _editClassDialog(int editClassID, String editClassName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(editClassName),
+          children: [
+            SimpleDialogOption(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditClassAddStudent(editClassID)),
+                  );
+                },
+                child: const Text('Add a student', style: bodyText)),
+            SimpleDialogOption(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            EditClassRemoveStudent(editClassID)),
+                  );
+                },
+                child: const Text('Remove a student', style: bodyText)),
+            SimpleDialogOption(
+                onPressed: () {
+                  _renameClassDialog(context, editClassID);
+                },
+                child: const Text('Rename class', style: bodyText)),
+            SimpleDialogOption(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleDialog(
+                        title: Text(
+                            'Are you sure that you want to delete '
+                            '$editClassName? This will delete all '
+                            'attendance records for this class.',
+                            textAlign: TextAlign.center),
+                        children: [
+                          SizedBox(
+                            height: 75,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: OutlinedButton(
+                                  onPressed: () {
+                                    removeClass(editClassID);
+                                    // Wait 250 ms for the database to update
+                                    Future.delayed(
+                                        const Duration(milliseconds: 250), () {
+                                      setState(() {
+                                        classID = [];
+                                        className = [];
+                                      });
+                                      _popNavigator(
+                                          context, isDesktop() ? 2 : 3);
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                  ),
+                                  child: const Text('Yes', style: bodyText)),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: const Text('Delete class', style: bodyText))
+          ],
+        );
+      },
+    );
+  }
+
+  /// Put the classes data into lists for this page only.
+  /// 
+  /// [classes] is the data from the classes table.
   void _addClassesToLists(List<dynamic> classes) {
-    for (var i = 0; i < classes.length; i++) {
-      classID.add(classes[i][0]);
-      classInfo.add(classes[i][1]);
+    for (var index = 0; index < classes.length; index++) {
+      classID.add(classes[index][0]);
+      className.add(classes[index][1]);
     }
   }
 
-  // Get Classes
+  /// Get all classes from the classes table.
+  /// 
+  /// Return a Future object with the classes data.
   Future<Result> getClassList() async {
     DatabaseHelper dbHelper = DatabaseHelper();
     return (dbHelper.getClasses());
   }
 
-  // This method is rerun every time setState is called
+  /// Dialog to update a class_name in the classes table.
+  /// 
+  /// [editClassID] is the class_id of the class to be renamed.
+  void _renameClassDialog(BuildContext context, int editClassID) {
+    var classNameTextField = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Rename the class', textAlign: TextAlign.center),
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: classNameTextField,
+                    maxLength: 100,
+                    minLines: 1,
+                    maxLines: 10,
+                    keyboardType: TextInputType.text,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Class name and time',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 75,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: OutlinedButton(
+                      onPressed: () {
+                        if (classNameTextField.text.isNotEmpty) {
+                          DatabaseHelper dbHelper = DatabaseHelper();
+                          dbHelper.renameClass(editClassID,
+                              classNameTextField.text.replaceAll('\n', ''));
+                          // Wait 250 ms for the database to update
+                          Future.delayed(const Duration(milliseconds: 250), () {
+                            setState(() {
+                              classID = [];
+                              className = [];
+                            });
+                            _popNavigator(context, isDesktop() ? 2 : 3);
+                          });
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title:
+                                      const Text('The value can not be empty.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      child: const Text('Rename class', style: bodyText)),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
+  /// Remove [classID] from the classes table.
+  void removeClass(int classID) async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    dbHelper.removeClass(classID);
+  }
+
+  /// Check to see if the app is running on a desktop or mobile device.
+  /// 
+  /// Mobile devices have a different layout.
+  bool isDesktop() {
+    return (kIsWeb ||
+        Platform.isWindows ||
+        Platform.isLinux ||
+        Platform.isMacOS ||
+        Platform.isFuchsia);
+  }
+
+  /// Pop the navigator [numPops] times.
+  void _popNavigator(BuildContext context, int numPops) {
+    for (var i = 0; i < numPops; i++) {
+      Navigator.pop(context);
+    }
+  }
+
+  /// Build the main page.
+  ///
+  /// This method is rerun every time setState is called.
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -235,7 +422,7 @@ class Home extends State<MyHomePage> {
               body: const Center(child: CircularProgressIndicator()),
             );
           } else if (snapshot.hasError || snapshot.data!.isEmpty) {
-            // Put snapshot data into classID and classInfo lists
+            // Put snapshot data into classID and className lists
             _addClassesToLists(snapshot.data!);
             // Display a message about no classes being found
             return Scaffold(
@@ -266,7 +453,7 @@ class Home extends State<MyHomePage> {
                     onPressed: () {
                       setState(() {
                         classID = [];
-                        classInfo = [];
+                        className = [];
                       });
                     },
                     backgroundColor: primaryColor,
@@ -304,7 +491,7 @@ class Home extends State<MyHomePage> {
               ),
             );
           } else {
-            // Put snapshot data into classID and classInfo lists
+            // Put snapshot data into classID and className lists
             _addClassesToLists(snapshot.data!);
             // Future object found; display classes
             return Scaffold(
@@ -315,15 +502,11 @@ class Home extends State<MyHomePage> {
               body: TwoDimensionalGridView(
                   diagonalDragBehavior: DiagonalDragBehavior.free,
                   // Different delegate for mobile and desktop
-                  delegate: kIsWeb ||
-                          Platform.isWindows ||
-                          Platform.isLinux ||
-                          Platform.isMacOS ||
-                          Platform.isFuchsia
+                  delegate: isDesktop()
                       // Desktop layout
                       ? TwoDimensionalChildBuilderDelegate(
                           maxXIndex: 3,
-                          maxYIndex: classInfo.length - 1,
+                          maxYIndex: className.length - 1,
                           builder:
                               (BuildContext context, ChildVicinity vicinity) {
                             return SizedBox(
@@ -333,7 +516,7 @@ class Home extends State<MyHomePage> {
                                   child: (vicinity.xIndex == 0)
                                       ? Center(
                                           child: Text(
-                                            classInfo[vicinity.yIndex],
+                                            className[vicinity.yIndex],
                                             style: bodyText,
                                             textAlign: TextAlign.center,
                                           ),
@@ -365,7 +548,7 @@ class Home extends State<MyHomePage> {
                                                                 ClassInformation(
                                                                     classID[vicinity
                                                                         .yIndex],
-                                                                    classInfo[
+                                                                    className[
                                                                         vicinity
                                                                             .yIndex])),
                                                       );
@@ -383,14 +566,20 @@ class Home extends State<MyHomePage> {
                                               : SizedBox(
                                                   width: 197,
                                                   child: ElevatedButton(
-                                                    onPressed: () {},
+                                                    onPressed: () {
+                                                      _editClassDialog(
+                                                          classID[
+                                                              vicinity.yIndex],
+                                                          className[
+                                                              vicinity.yIndex]);
+                                                    },
                                                     style: ElevatedButton
                                                         .styleFrom(
                                                       backgroundColor:
                                                           primaryColor,
                                                     ),
                                                     child: const Text(
-                                                        'Edit class info', // TODO: Implement
+                                                        'Edit class info',
                                                         style: bodyText),
                                                   ),
                                                 )),
@@ -399,7 +588,7 @@ class Home extends State<MyHomePage> {
                       // Mobile layout
                       : TwoDimensionalChildBuilderDelegate(
                           maxXIndex: 0,
-                          maxYIndex: classInfo.length - 1,
+                          maxYIndex: className.length - 1,
                           builder:
                               (BuildContext context, ChildVicinity vicinity) {
                             return SizedBox(
@@ -414,7 +603,7 @@ class Home extends State<MyHomePage> {
                                   backgroundColor: primaryColor,
                                 ),
                                 child: Text(
-                                  classInfo[vicinity.yIndex],
+                                  className[vicinity.yIndex],
                                   style: bodyText,
                                   textAlign: TextAlign.center,
                                 ),
@@ -438,7 +627,7 @@ class Home extends State<MyHomePage> {
                     onPressed: () {
                       setState(() {
                         classID = [];
-                        classInfo = [];
+                        className = [];
                       });
                     },
                     backgroundColor: primaryColor,

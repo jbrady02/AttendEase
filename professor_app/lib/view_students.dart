@@ -21,6 +21,9 @@ class Students extends StatelessWidget {
 
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
 
+  /// Dialog to add a student to the students table.
+  /// 
+  /// [customFields] is a list of the custom fields.
   void _addStudentDialog(BuildContext context, List<Student> customFields) {
     var givenNameTextField = TextEditingController();
     var surnameTextField = TextEditingController();
@@ -34,14 +37,14 @@ class Students extends StatelessWidget {
           return SimpleDialog(
             title: const Text('Add a student', textAlign: TextAlign.center),
             children: [
-              Padding(
+              Padding( // Given name text field
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
                   width: 200,
                   child: TextField(
                     controller: givenNameTextField,
-                    maxLength: 63,
+                    maxLength: 50,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Given name',
@@ -49,14 +52,14 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
+              Padding( // Surname text field
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
                   width: 200,
                   child: TextField(
                     controller: surnameTextField,
-                    maxLength: 63,
+                    maxLength: 50,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Surname',
@@ -64,14 +67,14 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
+              Padding( // Custom field 1 text field
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
                   width: 200,
                   child: TextField(
                     controller: customField1TextField,
-                    maxLength: 63,
+                    maxLength: 50,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: '${customFields[0].customField1} (optional)',
@@ -79,14 +82,14 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
+              Padding( // Custom field 2 text field
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
                   width: 200,
                   child: TextField(
                     controller: customField2TextField,
-                    maxLength: 63,
+                    maxLength: 50,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: '${customFields[0].customField2} (optional)',
@@ -94,14 +97,14 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
+              Padding( // Custom field 3 text field
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
                   width: 200,
                   child: TextField(
                     controller: customField3TextField,
-                    maxLength: 63,
+                    maxLength: 50,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: '${customFields[0].customField3} (optional)',
@@ -109,14 +112,14 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
+              Padding( // Custom field 4 text field
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
                   width: 200,
                   child: TextField(
                     controller: customField4TextField,
-                    maxLength: 63,
+                    maxLength: 50,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: '${customFields[0].customField4} (optional)',
@@ -124,7 +127,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(
+              SizedBox( // Add student button
                 height: 75,
                 child: Padding(
                   padding:
@@ -142,7 +145,7 @@ class Students extends StatelessWidget {
                               customField3TextField.text,
                               customField4TextField.text);
                           reload(context, 3);
-                        } else {
+                        } else { // If input is empty show an error dialog
                           showDialog(
                               context: context,
                               builder: (context) {
@@ -172,6 +175,10 @@ class Students extends StatelessWidget {
         });
   }
 
+  /// Dialog to remove a student from the students table.
+  /// 
+  /// [students] is a list Student objects containing.
+  /// information for all students in the students table.
   void _removeStudentDialog(BuildContext context, List<Student> students) {
     showDialog(
       context: context,
@@ -207,6 +214,7 @@ class Students extends StatelessWidget {
     );
   }
 
+  /// Dialog to edit a student in the students table.
   void _editStudentDialog(
       BuildContext context,
       List<Student> customFields,
@@ -234,7 +242,7 @@ class Students extends StatelessWidget {
                 width: 200,
                 child: TextField(
                   controller: editStudentTextField,
-                  maxLength: 63,
+                  maxLength: 50,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     labelText:
@@ -290,6 +298,9 @@ class Students extends StatelessWidget {
     );
   }
 
+  /// Reload the page so that the changes are displayed.
+  /// 
+  /// [numPops] is the number of pages to pop off the stack.
   Future<void> reload(BuildContext context, numPops) async {
     // Reload the page with the updated database
     // Wait 250 ms then reload the page
@@ -307,6 +318,7 @@ class Students extends StatelessWidget {
     });
   }
 
+  /// Build the view students page.
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Student>>(
@@ -317,7 +329,7 @@ class Students extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: const Text("All students"),
+                title: const Text('All students'),
               ),
               body: const Center(child: CircularProgressIndicator()),
             );
@@ -326,7 +338,7 @@ class Students extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: const Text("All students"),
+                title: const Text('All students'),
               ),
               body: const Center(
                   child: Text(
@@ -360,7 +372,7 @@ class Students extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: const Text("All students"),
+                title: const Text('All students'),
               ),
               body: TwoDimensionalGridView(
                   diagonalDragBehavior: DiagonalDragBehavior.free,

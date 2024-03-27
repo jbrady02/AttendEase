@@ -46,7 +46,10 @@ class ClassInformation extends StatelessWidget {
     '2023-07-09',
   ];
 
-  // Convert the database integer values to strings
+  /// Convert the database integer values to strings.
+  /// 
+  /// [attendanceInt] is the integer value from the database.
+  /// Return a string abbreviation of the attendance value.
   String _getAttendance(int attendanceInt) {
     switch (attendanceInt) {
       case present:
@@ -64,6 +67,10 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
+  /// Get a Color object determined by [attendanceInt].
+  /// 
+  /// [attendanceInt] is the integer value from the database.
+  /// Return a Color object determined by attendanceInt.
   Color _getColor(int attendanceInt) {
     switch (attendanceInt) {
       case present:
@@ -77,6 +84,10 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
+  /// Get a Color object determined by [attendanceInt].
+  /// 
+  /// [attendanceInt] is the integer value from the database.
+  /// Return a Color object determined by attendanceInt.
   Color _getOutlineColor(int attendanceInt) {
     switch (attendanceInt) {
       case absentUnexcused || tardyUnexcused:
@@ -88,6 +99,10 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
+  /// Show a dialog to select an attendance value.
+  /// 
+  /// [nameIndex] is the index of the student name in the students map.
+  /// [dateIndex] is the index of the class session date.
   void _showSelectionDialog(
       BuildContext context, int nameIndex, int dateIndex) {
     showDialog(
@@ -182,6 +197,7 @@ class ClassInformation extends StatelessWidget {
     });
   }
 
+  /// Build the class information page.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
