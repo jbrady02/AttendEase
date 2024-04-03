@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:professor_app/attendance.dart';
+import 'package:professor_app/database_helper.dart';
+import 'package:professor_app/student.dart';
 
 class ClassInformation extends StatelessWidget {
   final int classID;
@@ -29,25 +32,8 @@ class ClassInformation extends StatelessWidget {
   static const int tardyExcused = 4;
   static const int tardyUnexcused = 5;
 
-  // TODO: Get data from database
-
-  static const Map<String, List<int>> students = {
-    'Long String Name': [1, 2, 3, 4, 5],
-    'Jane Doe': [1, 0, 1, 1, 1],
-    'Alice': [0, 0, 0, 0, 0],
-    'Bob': [0, 1, 0, 1, 1]
-  };
-
-  static const List<String> classSessions = [
-    '2024-07-01',
-    '2024-07-03',
-    '2023-07-05',
-    '2023-07-07',
-    '2023-07-09',
-  ];
-
   /// Convert the database integer values to strings.
-  /// 
+  ///
   /// [attendanceInt] is the integer value from the database.
   /// Return a string abbreviation of the attendance value.
   String _getAttendance(int attendanceInt) {
@@ -68,7 +54,7 @@ class ClassInformation extends StatelessWidget {
   }
 
   /// Get a Color object determined by [attendanceInt].
-  /// 
+  ///
   /// [attendanceInt] is the integer value from the database.
   /// Return a Color object determined by attendanceInt.
   Color _getColor(int attendanceInt) {
@@ -85,7 +71,7 @@ class ClassInformation extends StatelessWidget {
   }
 
   /// Get a Color object determined by [attendanceInt].
-  /// 
+  ///
   /// [attendanceInt] is the integer value from the database.
   /// Return a Color object determined by attendanceInt.
   Color _getOutlineColor(int attendanceInt) {
@@ -100,95 +86,138 @@ class ClassInformation extends StatelessWidget {
   }
 
   /// Show a dialog to select an attendance value.
-  /// 
+  ///
   /// [nameIndex] is the index of the student name in the students map.
-  /// [dateIndex] is the index of the class session date.
+  /// [dateIndex] is the index of the class meeting date.
   void _showSelectionDialog(
-      BuildContext context, int nameIndex, int dateIndex) {
+    BuildContext context,
+    int nameIndex,
+    int dateIndex,
+    Map<Student, List<Attendance>> students,
+    List<String> classDates,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
           title: Text('Edit attendance data for '
-              '${students.keys.toList()[nameIndex]} '
-              'on ${classSessions[dateIndex]}'),
+              '${students.keys.toList()[nameIndex].givenName} '
+              '${students.keys.toList()[nameIndex].surname} '
+              'on ${classDates[dateIndex]}'),
           children: [
-            Container(
+            Container( // Button to record student as present.
               color: Colors.green,
               child: SimpleDialogOption(
                 onPressed: () {
+                  DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.editStudentAttendance(
+                      students.values.toList()[nameIndex][dateIndex].studentID,
+                      students.values.toList()[nameIndex][dateIndex].meetingID,
+                      present);
                   Navigator.pop(context, present);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] == present
-                    ? const Text('Present (current value)', style: bodyText)
-                    : const Text('Present', style: bodyText),
+                child:
+                    students.values.toList()[nameIndex][dateIndex].attendance ==
+                            present
+                        ? const Text('Present (current value)', style: bodyText)
+                        : const Text('Present', style: bodyText),
               ),
             ),
-            Container(
+            Container( // Button to record student as absent and excused.
               color: Colors.orange,
               child: SimpleDialogOption(
                 onPressed: () {
+                  DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.editStudentAttendance(
+                      students.values.toList()[nameIndex][dateIndex].studentID,
+                      students.values.toList()[nameIndex][dateIndex].meetingID,
+                      absentExcused);
                   Navigator.pop(context, absentExcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] ==
-                        absentExcused
-                    ? const Text('Absent and excused (current value)',
-                        style: bodyText)
-                    : const Text('Absent and excused', style: bodyText),
+                child:
+                    students.values.toList()[nameIndex][dateIndex].attendance ==
+                            absentExcused
+                        ? const Text('Absent and excused (current value)',
+                            style: bodyText)
+                        : const Text('Absent and excused', style: bodyText),
               ),
             ),
-            Container(
+            Container( // Button to record student as absent and unexcused.
               color: Colors.orange,
               child: SimpleDialogOption(
                 onPressed: () {
+                  DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.editStudentAttendance(
+                      students.values.toList()[nameIndex][dateIndex].studentID,
+                      students.values.toList()[nameIndex][dateIndex].meetingID,
+                      absentUnexcused);
                   Navigator.pop(context, absentUnexcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] ==
-                        absentUnexcused
-                    ? const Text('Absent and unexcused (current value)',
-                        style: bodyText)
-                    : const Text('Absent and unexcused', style: bodyText),
+                child:
+                    students.values.toList()[nameIndex][dateIndex].attendance ==
+                            absentUnexcused
+                        ? const Text('Absent and unexcused (current value)',
+                            style: bodyText)
+                        : const Text('Absent and unexcused', style: bodyText),
               ),
             ),
-            Container(
+            Container( // Button to record student as tardy and excused.
               color: Colors.yellow,
               child: SimpleDialogOption(
                 onPressed: () {
+                  DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.editStudentAttendance(
+                      students.values.toList()[nameIndex][dateIndex].studentID,
+                      students.values.toList()[nameIndex][dateIndex].meetingID,
+                      tardyExcused);
                   Navigator.pop(context, tardyExcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] ==
-                        tardyExcused
-                    ? const Text('Tardy and excused (current value)',
-                        style: bodyText)
-                    : const Text('Tardy and excused', style: bodyText),
+                child:
+                    students.values.toList()[nameIndex][dateIndex].attendance ==
+                            tardyExcused
+                        ? const Text('Tardy and excused (current value)',
+                            style: bodyText)
+                        : const Text('Tardy and excused', style: bodyText),
               ),
             ),
-            Container(
+            Container( // Button to record student as tardy and unexcused.
               color: Colors.yellow,
               child: SimpleDialogOption(
                 onPressed: () {
+                  DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.editStudentAttendance(
+                      students.values.toList()[nameIndex][dateIndex].studentID,
+                      students.values.toList()[nameIndex][dateIndex].meetingID,
+                      tardyUnexcused);
                   Navigator.pop(context, tardyUnexcused);
                 },
-                child: students.values.toList()[nameIndex][dateIndex] ==
-                        tardyUnexcused
-                    ? const Text('Tardy and unexcused (current value)',
-                        style: bodyText)
-                    : const Text('Tardy and unexcused', style: bodyText),
+                child:
+                    students.values.toList()[nameIndex][dateIndex].attendance ==
+                            tardyUnexcused
+                        ? const Text('Tardy and unexcused (current value)',
+                            style: bodyText)
+                        : const Text('Tardy and unexcused', style: bodyText),
               ),
             ),
-            SimpleDialogOption(
+            SimpleDialogOption( // Button to make student attendance unknown.
               onPressed: () {
+                DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.editStudentAttendance(
+                      students.values.toList()[nameIndex][dateIndex].studentID,
+                      students.values.toList()[nameIndex][dateIndex].meetingID,
+                      unknown);
                 Navigator.pop(context, unknown);
               },
-              child: students.values.toList()[nameIndex][dateIndex] == unknown
-                  ? const Text('Unknown (current value)', style: bodyText)
-                  : const Text('Unknown', style: bodyText),
+              child:
+                  students.values.toList()[nameIndex][dateIndex].attendance ==
+                          unknown
+                      ? const Text('Unknown (current value)', style: bodyText)
+                      : const Text('Unknown', style: bodyText),
             ),
           ],
         );
       },
     ).then((selectedValue) {
-      // TODO: Update database attendance data
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -197,100 +226,256 @@ class ClassInformation extends StatelessWidget {
     });
   }
 
+  /// Get the students and their attendance values from the database.
+  ///
+  /// Return a map of a map of students and their attendance values
+  /// and the dates of the meetings.
+  Future<Map<Map<Student, List<Attendance>>, List<String>>>
+      _getStudentsAndAttendance() async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    List<Student> studentsList = await dbHelper.getAllStudentsInClass(classID);
+    List<List<int>> attendanceData = await dbHelper.getAttendance(classID);
+    List<String> classDates = [];
+    // Make list of meetingIDs and if they match skip.
+    List<int> meetingIDs = [];
+    for (var row in attendanceData) {
+      if (!meetingIDs.contains(row[1])) {
+        meetingIDs.add(row[1]);
+        classDates.add(await dbHelper.getMeetingDate(row[1]));
+      }
+    }
+    Map<Student, List<Attendance>> students = {};
+    // Add attendance value for each student for each meeting.
+    // Make attendanceMap keys the students and the values an empty list.
+    for (var student in studentsList) {
+      students[student] = [];
+    }
+    // Add Attendance objects to students.
+    for (int meetingIndex = 0;
+        meetingIndex < meetingIDs.length;
+        meetingIndex++) {
+      for (List<int> row in attendanceData) {
+        if (row[1] == meetingIDs[meetingIndex]) {
+          for (int index = 0; index < studentsList.length; index++) {
+            if (studentsList[index].studentID == row[0]) {
+              students[studentsList[index]]!
+                  .add(Attendance(row[0], row[1], row[2]));
+            }
+          }
+        }
+      }
+    }
+    // Make a map of a map of students and their attendance values
+    // and the dates of the meetings.
+    Map<Map<Student, List<Attendance>>, List<String>> studentAttendance = {};
+    studentAttendance[students] = classDates;
+    return studentAttendance;
+  }
+
+  /// Reload the page so that the changes are displayed.
+  ///
+  /// [numPops] is the number of pages to pop off the stack.
+  Future<void> reload(BuildContext context, numPops) async {
+    // Reload the page with the updated database
+    // Wait 250 ms then reload the page
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        });
+    await Future.delayed(const Duration(milliseconds: 250), () {
+      for (var i = 0; i < numPops; i++) {
+        Navigator.pop(context);
+      }
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ClassInformation(classID, classInfo)));
+    });
+  }
+
   /// Build the class information page.
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        title: Text(classInfo),
-      ),
-      body: TwoDimensionalGridView(
-        diagonalDragBehavior: DiagonalDragBehavior.free,
-        delegate: TwoDimensionalChildBuilderDelegate(
-            maxXIndex: students.values.first.length,
-            maxYIndex: students.length,
-            builder: (BuildContext context, ChildVicinity vicinity) {
-              return SizedBox(
-                  height: 75,
-                  width: 75,
-                  child: Center(
-                    child: (vicinity.xIndex == 0 && vicinity.yIndex == 0)
-                        ? null // Empty top-left corner
-                        : (vicinity.xIndex == 0)
-                            ? Center(
-                                child: Text(
-                                    // Name
-                                    students.keys
-                                        .toList()[vicinity.yIndex - 1]
-                                        .replaceAll('-', '-\n'),
-                                    style:
-                                        // Separate name by spaces and if a
-                                        // token has than 8 characters,
-                                        // decrease the font size
-                                        students.keys
-                                                .toList()[vicinity.yIndex - 1]
-                                                .split(' ')
-                                                .any((element) =>
-                                                    element.length > 8)
-                                            ? smallBodyText.copyWith(
-                                                fontSize: 12)
-                                            : smallBodyText,
-                                    textAlign: TextAlign.center),
-                              )
-                            : (vicinity.yIndex == 0)
-                                ? Center(
-                                    child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 13, right: 13),
-                                    child: Text(
-                                        // Date
-                                        classSessions[vicinity.xIndex - 1],
-                                        style: smallBodyText,
-                                        textAlign: TextAlign.center),
-                                  ))
-                                : SizedBox(
-                                    width: 70,
-                                    child: OutlinedButton(
-                                      // Attendance
-                                      onPressed: () {
-                                        _showSelectionDialog(
-                                            context,
-                                            vicinity.yIndex - 1,
-                                            vicinity.xIndex - 1);
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                          side: BorderSide(
-                                              color: _getOutlineColor(
-                                                  students.values.toList()[
-                                                          vicinity.yIndex - 1]
-                                                      [vicinity.xIndex - 1]),
-                                              width: 3), // Set the border color
-                                          backgroundColor: _getColor(students
-                                                  .values
-                                                  .toList()[vicinity.yIndex - 1]
-                                              [vicinity.xIndex - 1])),
-                                      // Set the background color
-                                      child: Text(
-                                          _getAttendance(
-                                              // Get attendance value
-                                              students.values.toList()[
-                                                      vicinity.yIndex - 1]
-                                                  [vicinity.xIndex - 1]),
-                                          style: smallBodyText),
-                                    ),
-                                  ),
-                  ));
-            }),
-      ),
-      // TODO: Make button that turns all unknown data into absent unexcused
-      bottomNavigationBar: const FloatingActionButton(
-        heroTag: 'makeUnknownDataAbsentUnexcused',
-        onPressed: null, // TODO: Implement
-        backgroundColor: primaryColor,
-        child: Text('Make all unknown data absent unexcused', style: bodyText),
-      ),
-    );
+    return FutureBuilder<Map<Map<Student, List<Attendance>>, List<String>>>(
+        future: _getStudentsAndAttendance(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // While waiting, display a loading indicator.
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: primaryColor,
+                title: const Text('All students'),
+              ),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          } else if (snapshot.hasError) {
+            // If an error occurs, display an error message.
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: primaryColor,
+                title: const Text('All students'),
+              ),
+              body: const Center(
+                  child: Text(
+                'Could not connect to the database. Please refresh the page.',
+                style: bodyText,
+                textAlign: TextAlign.center,
+              )),
+              bottomNavigationBar: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'refreshStudent',
+                    onPressed: () {
+                      reload(context, 2);
+                    },
+                    backgroundColor: primaryColor,
+                    tooltip: 'Refresh page',
+                    child: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+            );
+          } else if (snapshot.data!.keys.first.isEmpty) {
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: primaryColor,
+                title: const Text('All students'),
+              ),
+              body: const Center(
+                  child: Text(
+                'There are no students in this class. Please add students.',
+                style: bodyText,
+                textAlign: TextAlign.center,
+              )),
+              bottomNavigationBar: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'refreshStudent',
+                    onPressed: () {
+                      reload(context, 2);
+                    },
+                    backgroundColor: primaryColor,
+                    tooltip: 'Refresh page',
+                    child: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            // Future object found; display students.
+            Map<Student, List<Attendance>>? students =
+                snapshot.data!.keys.first;
+            List<String>? classDates = snapshot.data!.values.first;
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: primaryColor,
+                title: Text('Edit attendance data for $classInfo'),
+              ),
+              body: TwoDimensionalGridView(
+                diagonalDragBehavior: DiagonalDragBehavior.free,
+                delegate: TwoDimensionalChildBuilderDelegate(
+                    maxXIndex: students.values.first.length,
+                    maxYIndex: students.length,
+                    builder: (BuildContext context, ChildVicinity vicinity) {
+                      return SizedBox(
+                          height: 75,
+                          width: 75,
+                          child: Center(
+                            child: (vicinity.xIndex == 0 &&
+                                    vicinity.yIndex == 0)
+                                ? null // Empty top-left corner.
+                                : (vicinity.xIndex == 0)
+                                    ? Center(
+                                        child: Text(
+                                            // Name
+                                            '${students.keys.toList()[vicinity.yIndex - 1].givenName} ${students.keys.toList()[vicinity.yIndex - 1].surname.replaceAll('-', '-\n')}',
+                                            style:
+                                                // Separate name by spaces and if a
+                                                // token has than 8 characters,
+                                                // decrease the font size.
+                                                '${students.keys.toList()[vicinity.yIndex - 1].givenName} ${students.keys.toList()[vicinity.yIndex - 1].surname}'
+                                                        .split(' ')
+                                                        .any((element) =>
+                                                            element.length > 8)
+                                                    ? smallBodyText.copyWith(
+                                                        fontSize: 12)
+                                                    : smallBodyText,
+                                            textAlign: TextAlign.center),
+                                      )
+                                    : (vicinity.yIndex == 0)
+                                        ? Center(
+                                            child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 13, right: 13),
+                                            child: Text(
+                                                // Date
+                                                classDates[vicinity.xIndex - 1],
+                                                style: smallBodyText,
+                                                textAlign: TextAlign.center),
+                                          ))
+                                        : SizedBox(
+                                            width: 70,
+                                            child: OutlinedButton(
+                                              // Attendance
+                                              onPressed: () {
+                                                _showSelectionDialog(
+                                                    context,
+                                                    vicinity.yIndex - 1,
+                                                    vicinity.xIndex - 1,
+                                                    students,
+                                                    classDates);
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                  side: BorderSide(
+                                                      color: _getOutlineColor(
+                                                          students.values
+                                                              .toList()[vicinity
+                                                                      .yIndex -
+                                                                  1][vicinity
+                                                                      .xIndex -
+                                                                  1]
+                                                              .attendance),
+                                                      width:
+                                                          3), // Set the border color.
+                                                  backgroundColor: _getColor(students
+                                                      .values
+                                                      .toList()[vicinity.yIndex - 1]
+                                                          [vicinity.xIndex - 1]
+                                                      .attendance)),
+                                              // Set the background color.
+                                              child: Text(
+                                                  _getAttendance(
+                                                      // Get attendance value.
+                                                      students.values
+                                                          .toList()[
+                                                              vicinity.yIndex -
+                                                                  1][
+                                                              vicinity.xIndex -
+                                                                  1]
+                                                          .attendance),
+                                                  style: smallBodyText),
+                                            ),
+                                          ),
+                          ));
+                    }),
+              ),
+              bottomNavigationBar: FloatingActionButton(
+                heroTag: 'makeUnknownDataAbsentUnexcused',
+                onPressed: () {
+                  DatabaseHelper dbHelper = DatabaseHelper();
+                  dbHelper.makeUnknownDataAbsentUnexcused(classID);
+                  reload(context, 2);
+                },
+                backgroundColor: primaryColor,
+                child: const Text('Make all unknown data absent unexcused',
+                    style: bodyText),
+              ),
+            );
+          }
+        });
   }
 }
 

@@ -65,7 +65,7 @@ class EditClassAddStudent extends StatelessWidget {
         future: getAllStudentsAndClass(classID),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // While waiting, display a loading indicator
+            // While waiting, display a loading indicator.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -74,7 +74,7 @@ class EditClassAddStudent extends StatelessWidget {
               body: const Center(child: CircularProgressIndicator()),
             );
           } else if (snapshot.hasError) {
-            // If an error occurs, display an error message
+            // If an error occurs, display an error message.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -88,7 +88,7 @@ class EditClassAddStudent extends StatelessWidget {
               )),
             );
           } else {
-            // Future object found; display students
+            // Future object found; display students.
             List<Student>? students = snapshot.data!.keys.first
                 .where((student) => student.studentID != 0)
                 .toList();
@@ -98,7 +98,7 @@ class EditClassAddStudent extends StatelessWidget {
               for (int i = 0; i < students.length; i++) {
                 if (classInfo[2].contains(students[i].studentID)) {
                   students.removeAt(i);
-                  i--; // Decrement i to account for the removed element
+                  i--; // Decrement i to account for the removed element.
                 }
               }
             }
@@ -107,7 +107,7 @@ class EditClassAddStudent extends StatelessWidget {
                 backgroundColor: primaryColor,
                 title: Text('Add a student to ${classInfo[1]}'),
               ),
-              body: (students.length - 1 < 0) // Message if no students found
+              body: (students.length - 1 < 0) // Message if no students found.
                   ? const Center(
                       child: Text(
                       'No students that are not already in the class were found.',

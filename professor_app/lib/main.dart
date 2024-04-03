@@ -127,7 +127,7 @@ class Home extends State<MyHomePage> {
                           DatabaseHelper dbHelper = DatabaseHelper();
                           dbHelper.addClass(
                               classNameTextField.text.replaceAll('\n', ''));
-                          // Wait 250 ms for the database to update
+                          // Wait 250 ms for the database to update.
                           Future.delayed(const Duration(milliseconds: 250), () {
                             setState(() {
                               classIDList = [];
@@ -257,7 +257,7 @@ class Home extends State<MyHomePage> {
                               child: OutlinedButton(
                                   onPressed: () {
                                     removeClass(classID);
-                                    // Wait 250 ms for the database to update
+                                    // Wait 250 ms for the database to update.
                                     Future.delayed(
                                         const Duration(milliseconds: 250), () {
                                       setState(() {
@@ -324,7 +324,7 @@ class Home extends State<MyHomePage> {
                         if (classDateTextField.text.isNotEmpty) {
                           Navigator.pop(context);
                           _takeAttendance(classID, classDateTextField.text);
-                          // Wait 250 ms for the database to update
+                          // Wait 250 ms for the database to update.
                           Future.delayed(const Duration(milliseconds: 250), () {
                             setState(() {
                               classIDList = [];
@@ -370,12 +370,36 @@ class Home extends State<MyHomePage> {
   /// [classDate] is the date of the class meeting.
   void _takeAttendance(int classID, String classDate) async {
     DatabaseHelper dbHelper = DatabaseHelper();
-    Result meetingIDResult = await dbHelper.addClassMeeting(classID, classDate);
-    int meetingID = meetingIDResult[0][0] as int;
-    List<int> students = await dbHelper.getAllStudentsInClass(classID);
-    // Add a students in the class to the student_attendance table
-    for (var index = 0; index < students.length; index++) {
-      dbHelper.addStudentAttendance(students[index], meetingID, 0);
+    // Check if the class meeting date already exists.
+    if (await dbHelper.duplicateClassDate(classID, classDate)) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('This class meeting date already exists '
+                  'for this class.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      Result meetingIDResult =
+          await dbHelper.addClassMeeting(classID, classDate);
+      int meetingID = meetingIDResult[0][0] as int;
+      List<int> students = await dbHelper.getAllStudentIDsInClass(classID);
+      // Add a students in the class to the student_attendance table.
+      for (var index = 0; index < students.length; index++) {
+        dbHelper.addStudentAttendance(students[index], meetingID, classID, 0);
+      }
     }
   }
 
@@ -437,7 +461,7 @@ class Home extends State<MyHomePage> {
                           DatabaseHelper dbHelper = DatabaseHelper();
                           dbHelper.renameClass(classID,
                               classNameTextField.text.replaceAll('\n', ''));
-                          // Wait 250 ms for the database to update
+                          // Wait 250 ms for the database to update.
                           Future.delayed(const Duration(milliseconds: 250), () {
                             setState(() {
                               classIDList = [];
@@ -510,12 +534,12 @@ class Home extends State<MyHomePage> {
   /// This method is rerun every time setState is called.
   @override
   Widget build(BuildContext context) {
-    verifyDatabaseTables(); // Create database tables if they don't exist
+    verifyDatabaseTables(); // Create database tables if they don't exist.
     return FutureBuilder(
         future: getClassList(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // While waiting, display a loading indicator
+            // While waiting, display a loading indicator.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -524,9 +548,7 @@ class Home extends State<MyHomePage> {
               body: const Center(child: CircularProgressIndicator()),
             );
           } else if (snapshot.hasError || snapshot.data!.isEmpty) {
-            // Put snapshot data into classIDList and classNameList lists
-            _addClassesToLists(snapshot.data!);
-            // Display a message about no classes being found
+            // Display a message about no classes being found.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -593,9 +615,9 @@ class Home extends State<MyHomePage> {
               ),
             );
           } else {
-            // Put snapshot data into classIDList and classNameList lists
+            // Put snapshot data into classIDList and classNameList lists.
             _addClassesToLists(snapshot.data!);
-            // Future object found; display classes
+            // Future object found; display classes.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -603,7 +625,7 @@ class Home extends State<MyHomePage> {
               ),
               body: TwoDimensionalGridView(
                   diagonalDragBehavior: DiagonalDragBehavior.free,
-                  // Different delegate for mobile and desktop
+                  // Different delegate for mobile and desktop.
                   delegate: isDesktop()
                       // Desktop layout
                       ? TwoDimensionalChildBuilderDelegate(
@@ -638,7 +660,7 @@ class Home extends State<MyHomePage> {
                                                   backgroundColor: primaryColor,
                                                 ),
                                                 child: const Text(
-                                                    'Take attendance', // TODO: Implement
+                                                    'Take attendance',
                                                     style: bodyText),
                                               ),
                                             )

@@ -14,11 +14,11 @@ class DatabaseHelper {
                 Platform.isMacOS ||
                 Platform.isFuchsia
             ? 'localhost'
-            : '10.0.2.2', // Android localhost
+            : '10.0.2.2', // Android localhost is different.
         database: 'postgres',
         port: 5432,
         username: 'postgres',
-        password: getPassword(), // Insert password here
+        password: getPassword(), // Insert password here.
       ),
       // The postgres server hosted locally doesn't have SSL by default. If you're
       // accessing a postgres server over the Internet, the server should support
@@ -28,7 +28,7 @@ class DatabaseHelper {
     return conn;
   }
 
-  /// Return the password from a file
+  /// Return the password from a file.
   String getPassword() {
     File file = File('${Directory.current.path}\\lib\\password.txt');
     if (file.existsSync()) {
@@ -60,7 +60,14 @@ class DatabaseHelper {
       class_id INT REFERENCES classes(class_id) ON DELETE CASCADE,
       date VARCHAR
     );''');
-    conn.close();
+    await conn.execute('''CREATE TABLE IF NOT EXISTS student_attendance (
+      attendance_id SERIAL PRIMARY KEY,
+      student_id INT REFERENCES students(student_id) ON DELETE CASCADE,
+      meeting_id INT REFERENCES class_meetings(meeting_id) ON DELETE CASCADE,
+      class_id INT REFERENCES classes(class_id) ON DELETE CASCADE,
+      attendance INT
+    );''');
+    await conn.close();
   }
 
   /// Create Classes table if it does not exist, then return the table.
@@ -74,7 +81,7 @@ class DatabaseHelper {
 
     final Result results = await conn.execute(
         'SELECT class_id, class_name FROM classes ORDER BY class_name ASC');
-    conn.close();
+    await conn.close();
     return results;
   }
 
@@ -85,7 +92,7 @@ class DatabaseHelper {
       'INSERT INTO classes (class_name) VALUES (\$1)',
       parameters: [className],
     );
-    conn.close();
+    await conn.close();
   }
 
   /// Get a class from the classes table.
@@ -98,7 +105,7 @@ class DatabaseHelper {
       'SELECT * FROM classes WHERE class_id = \$1',
       parameters: [classID],
     );
-    conn.close();
+    await conn.close();
     return results;
   }
 
@@ -106,18 +113,20 @@ class DatabaseHelper {
   ///
   /// [classID] is the requested class_id.
   /// Return the class information with the matching [class_id].
-  Future<List<int>> getAllStudentsInClass(int classID) async {
+  Future<List<int>> getAllStudentIDsInClass(int classID) async {
     Connection conn = await connectToDatabase();
     final Result results = await conn.execute(
       'SELECT students FROM classes WHERE class_id = \$1',
       parameters: [classID],
     );
-    conn.close();
-    // Convert results to int
+    await conn.close();
+    // Convert results to int.
     List<int> studentIDs = [];
     for (var row in results) {
-      List<int> studentIDsFromRow = row[0] as List<int>;
-      studentIDs.addAll(studentIDsFromRow);
+      if (row[0] != null) {
+        List<int> studentIDsFromRow = row[0] as List<int>;
+        studentIDs.addAll(studentIDsFromRow);
+      }
     }
     return studentIDs;
   }
@@ -135,7 +144,7 @@ class DatabaseHelper {
         'custom_field_4 VARCHAR'
         ');');
 
-    // Insert student that is used only for the custom field names
+    // Insert student that is used only for the custom field names.
     await conn.execute('''INSERT INTO students (student_id, given_name, 
       surname, custom_field_1, custom_field_2, custom_field_3, 
       custom_field_4) VALUES (0, 'Given name', 'Surname', 'Custom field 1', 
@@ -144,7 +153,7 @@ class DatabaseHelper {
 
     final Result results =
         await conn.execute('SELECT * FROM students ORDER BY surname ASC');
-    conn.close();
+    await conn.close();
     return results
         .map((row) => Student(
             row[0] as int,
@@ -179,7 +188,7 @@ class DatabaseHelper {
         customField4
       ],
     );
-    conn.close();
+    await conn.close();
   }
 
   /// Remove a student from the students table.
@@ -191,7 +200,7 @@ class DatabaseHelper {
       'DELETE FROM students WHERE student_id = \$1',
       parameters: [studentId],
     );
-    conn.close();
+    await conn.close();
   }
 
   /// Remove a class from the classes table.
@@ -203,9 +212,7 @@ class DatabaseHelper {
       'DELETE FROM classes WHERE class_id = \$1',
       parameters: [classID],
     );
-
-    // TODO: Remove attendance values for the class
-    conn.close();
+    await conn.close();
   }
 
   /// Update a student in the students table.
@@ -219,7 +226,7 @@ class DatabaseHelper {
       'UPDATE students SET $field = \$1 WHERE student_id = \$2',
       parameters: [value, studentId],
     );
-    conn.close();
+    await conn.close();
   }
 
   /// Append a [studentID] to the students list in a classID record.
@@ -231,29 +238,32 @@ class DatabaseHelper {
       parameters: [studentID, classID],
     );
 
-    // Remove duplcate values from classes
+    // Remove duplcate values from classes.
     await conn.execute(
       '''UPDATE classes SET students = (SELECT array_agg(DISTINCT x) 
         FROM unnest(students) x) WHERE class_id = \$1''',
       parameters: [classID],
     );
 
-    // TODO: Add attendance values for the new student for existing classes
-    conn.close();
+    // Set all student attendance records to unknown for the new student.
+    await conn.execute(
+      '''INSERT INTO student_attendance (student_id, meeting_id, class_id, attendance) 
+        SELECT \$1, meeting_id, \$2, 0 FROM class_meetings WHERE class_id = \$2''',
+      parameters: [studentID, classID],
+    );
+    await conn.close();
   }
 
   /// Remove a [studentID] from the students list in a [classID] record.
   void removeStudentFromClass(int classID, int studentID) async {
     Connection conn = await connectToDatabase();
-    // Remove student from class
+    // Remove student from class.
     await conn.execute(
       '''UPDATE classes SET students = array_remove(
         students, \$1) WHERE class_id = \$2''',
       parameters: [studentID, classID],
     );
-
-    // TODO: Remove attendance values for the student from the class
-    conn.close();
+    await conn.close();
   }
 
   /// Update [class_name] for a [classID] record
@@ -263,7 +273,7 @@ class DatabaseHelper {
       'UPDATE classes SET class_name = \$1 WHERE class_id = \$2',
       parameters: [className, classID],
     );
-    conn.close();
+    await conn.close();
   }
 
   /// Add a class meeting to the class_meetings table.
@@ -277,12 +287,12 @@ class DatabaseHelper {
       parameters: [classID, date],
     );
 
-    // Return the meeting_id of the new meeting
+    // Return the meeting_id of the new meeting.
     final Result results = await conn.execute(
       'SELECT meeting_id FROM class_meetings WHERE class_id = \$1 AND date = \$2',
       parameters: [classID, date],
     );
-    conn.close();
+    await conn.close();
     return results;
   }
 
@@ -290,21 +300,118 @@ class DatabaseHelper {
   ///
   /// [studentID] is the student_id of the student.
   /// [meetingID] is the meeting_id of the class meeting.
+  /// [classID] is the class_id of the class.
   /// [attendance] is the attendance value for the student.
   void addStudentAttendance(
-      int studentID, int meetingID, int attendance) async {
+      int studentID, int meetingID, int classID, int attendance) async {
     Connection conn = await connectToDatabase();
     await conn.execute('''CREATE TABLE IF NOT EXISTS student_attendance (
       attendance_id SERIAL PRIMARY KEY,
       student_id INT REFERENCES students(student_id) ON DELETE CASCADE,
       meeting_id INT REFERENCES class_meetings(meeting_id) ON DELETE CASCADE,
+      class_id INT REFERENCES classes(class_id) ON DELETE CASCADE,
       attendance INT
     );''');
 
     await conn.execute(
-      '''INSERT INTO student_attendance (student_id, meeting_id, attendance) 
-        VALUES (\$1, \$2, \$3)''',
-      parameters: [studentID, meetingID, attendance],
+      '''INSERT INTO student_attendance (student_id, meeting_id, class_id, attendance) 
+        VALUES (\$1, \$2, \$3, \$4)''',
+      parameters: [studentID, meetingID, classID, attendance],
     );
+  }
+
+  /// Get the attendance records for all students in [classID].
+  ///
+  /// Get the attendance from student_attendance
+  /// where meeting_id is in class_meetings for [classID].
+  /// Return a list of lists with the student_id, meeting_id, and attendance.
+  Future<List<List<int>>> getAttendance(int classID) async {
+    Connection conn = await connectToDatabase();
+    final Result results = await conn.execute(
+      '''SELECT student_id, meeting_id, attendance FROM student_attendance 
+        WHERE meeting_id IN (SELECT meeting_id FROM class_meetings 
+        WHERE class_id = \$1) ORDER BY meeting_id ASC, student_id ASC''',
+      parameters: [classID],
+    );
+    await conn.close();
+    // Map results to a list.
+    return results
+        .map((row) => [row[0] as int, row[1] as int, row[2] as int])
+        .toList();
+  }
+
+  /// Get all students in [classID].
+  Future<List<Student>> getAllStudentsInClass(int classID) async {
+    Connection conn = await connectToDatabase();
+    final Result results = await conn.execute(
+      '''SELECT students.* FROM students 
+      JOIN classes ON students.student_id = ANY(classes.students) 
+      WHERE classes.class_id = \$1 ORDER BY students.surname;''',
+      parameters: [classID],
+    );
+    await conn.close();
+    return results
+        .map((row) => Student(
+            row[0] as int,
+            row[1] as String,
+            row[2] as String,
+            row[3] as String,
+            row[4] as String,
+            row[5] as String,
+            row[6] as String))
+        .toList();
+  }
+
+  /// Modify a student attendance record.
+  ///
+  /// [studentID] is the student_id of the student.
+  /// [meetingID] is the meeting_id of the class meeting.
+  /// [attendance] is the new attendance value for the student.
+  void editStudentAttendance(
+      int studentID, int meetingID, int attendance) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute(
+      '''UPDATE student_attendance SET attendance = \$1 
+        WHERE student_id = \$2 AND meeting_id = \$3''',
+      parameters: [attendance, studentID, meetingID],
+    );
+    await conn.close();
+  }
+
+  /// Get the class meeting date for a [meetingID].
+  Future<String> getMeetingDate(int meetingID) async {
+    Connection conn = await connectToDatabase();
+    final Result results = await conn.execute(
+      'SELECT date FROM class_meetings WHERE meeting_id = \$1',
+      parameters: [meetingID],
+    );
+    await conn.close();
+    return results[0][0] as String;
+  }
+
+  /// Check if the class meeting date is a duplicate.
+  /// 
+  /// [classID] is the class_id of the class.
+  /// [date] is the date of the class meeting.
+  /// Return true if the date is a duplicate, false if unique.
+  Future<bool> duplicateClassDate(int classID, String date) async {
+    Connection conn = await connectToDatabase();
+    final Result results = await conn.execute(
+      'SELECT date FROM class_meetings WHERE class_id = \$1 AND date = \$2',
+      parameters: [classID, date],
+    );
+    await conn.close();
+    return results.isNotEmpty;
+  }
+
+  /// Make all unknown attendance data in [classID] absent unexcused.
+  void makeUnknownDataAbsentUnexcused(int classID) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute(
+      '''UPDATE student_attendance SET attendance = 2 
+        WHERE class_id = \$1 AND attendance = 0''',
+      parameters: [classID],
+    );
+    await conn.close();
   }
 }

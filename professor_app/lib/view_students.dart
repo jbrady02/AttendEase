@@ -37,7 +37,7 @@ class Students extends StatelessWidget {
           return SimpleDialog(
             title: const Text('Add a student', textAlign: TextAlign.center),
             children: [
-              Padding( // Given name text field
+              Padding( // Given name text field.
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
@@ -52,7 +52,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding( // Surname text field
+              Padding( // Surname text field.
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
@@ -67,7 +67,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding( // Custom field 1 text field
+              Padding( // Custom field 1 text field.
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
@@ -82,7 +82,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding( // Custom field 2 text field
+              Padding( // Custom field 2 text field.
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
@@ -97,7 +97,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding( // Custom field 3 text field
+              Padding( // Custom field 3 text field.
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
@@ -112,7 +112,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding( // Custom field 4 text field
+              Padding( // Custom field 4 text field.
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SizedBox(
@@ -127,7 +127,7 @@ class Students extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox( // Add student button
+              SizedBox( // Add student button.
                 height: 75,
                 child: Padding(
                   padding:
@@ -145,7 +145,7 @@ class Students extends StatelessWidget {
                               customField3TextField.text,
                               customField4TextField.text);
                           reload(context, 3);
-                        } else { // If input is empty show an error dialog
+                        } else { // If input is empty show an error dialog.
                           showDialog(
                               context: context,
                               builder: (context) {
@@ -185,7 +185,7 @@ class Students extends StatelessWidget {
       builder: (BuildContext context) {
         return SimpleDialog(
           title: const Text('Remove a student', textAlign: TextAlign.center),
-          // Make children a list of buttons, one for each student
+          // Make children a list of buttons, one for each student.
           children: students
               .map((students) => Padding(
                     padding: const EdgeInsets.symmetric(
@@ -325,7 +325,7 @@ class Students extends StatelessWidget {
         future: getAllStudents(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // While waiting, display a loading indicator
+            // While waiting, display a loading indicator.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -334,7 +334,7 @@ class Students extends StatelessWidget {
               body: const Center(child: CircularProgressIndicator()),
             );
           } else if (snapshot.hasError) {
-            // If an error occurs, display an error message
+            // If an error occurs, display an error message.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
@@ -362,12 +362,12 @@ class Students extends StatelessWidget {
               ),
             );
           } else {
-            // Future object found; display students
+            // Future object found; display students.
             List<Student>? students = snapshot.data;
             List<Student>?
-                customFields = // Get the custom fields from student 0
+                customFields = // Get the custom fields from student 0.
                 students?.where((student) => student.studentID == 0).toList();
-            students = // Remove student 0 from the list of students
+            students = // Remove student 0 from the list of students.
                 students?.where((student) => student.studentID != 0).toList();
             return Scaffold(
               appBar: AppBar(
@@ -426,7 +426,7 @@ class Students extends StatelessWidget {
                                                                           : customFields[0]
                                                                               .customField4,
                                                       (vicinity.xIndex ==
-                                                              0) // Table column names
+                                                              0) // Table column names.
                                                           ? 'given_name'
                                                           : (vicinity.xIndex ==
                                                                   1)
@@ -485,7 +485,7 @@ class Students extends StatelessWidget {
                                               backgroundColor: primaryColor,
                                             ),
                                             child: Text(
-                                              // Student data
+                                              // Display student information.
                                               (vicinity.yIndex != 0)
                                                   ? (vicinity.xIndex == 0)
                                                       ? students![vicinity.yIndex - 1]
