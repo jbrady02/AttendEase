@@ -180,7 +180,7 @@ class Home extends State<MyHomePage> {
                   _takeAttendanceDialog(
                       classIDList[classIndex], classNameList[classIndex]);
                 },
-                child: const Text('Add class session', style: bodyText)),
+                child: const Text('Add session', style: bodyText)),
             SimpleDialogOption(
                 onPressed: () {
                   Navigator.push(
@@ -679,7 +679,7 @@ class Home extends State<MyHomePage> {
                                                   backgroundColor: primaryColor,
                                                 ),
                                                 child: const Text(
-                                                    'Add class session',
+                                                    'Add session',
                                                     style: bodyText),
                                               ),
                                             )
