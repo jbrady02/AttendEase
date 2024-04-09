@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:postgres/postgres.dart';
 import 'package:professor_app/edit_class_add_student.dart';
 import 'package:professor_app/edit_class_remove_student.dart';
+import 'package:professor_app/qr_code.dart';
 import 'class_information.dart';
 import 'database_helper.dart';
 import 'view_students.dart';
@@ -179,8 +180,7 @@ class Home extends State<MyHomePage> {
                   _takeAttendanceDialog(
                       classIDList[classIndex], classNameList[classIndex]);
                 },
-                child: const Text('Add a name for the class session you wi',
-                    style: bodyText)),
+                child: const Text('Add class session', style: bodyText)),
             SimpleDialogOption(
                 onPressed: () {
                   Navigator.push(
@@ -320,10 +320,14 @@ class Home extends State<MyHomePage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: OutlinedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (classDateTextField.text.isNotEmpty) {
                           Navigator.pop(context);
-                          _takeAttendance(classID, classDateTextField.text);
+                          // If successfully added a class meeting show QR code.
+                          if (await _takeAttendance(
+                              classID, classDateTextField.text)) {
+                            makeQrCode(classID, classDateTextField.text);
+                          }
                           // Wait 250 ms for the database to update.
                           Future.delayed(const Duration(milliseconds: 250), () {
                             setState(() {
@@ -361,6 +365,17 @@ class Home extends State<MyHomePage> {
         });
   }
 
+  /// Create a QR code for the class meeting.
+  ///
+  /// [classID] is the class_id of the class to take attendance for.
+  /// [classDate] is the date of the class meeting.
+  void makeQrCode(int classID, String classDate) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const QRCodePage()),
+    );
+  }
+
   /// Start a new class session.
   ///
   /// Insert a new class meeting record into the class_meetings table and
@@ -368,7 +383,9 @@ class Home extends State<MyHomePage> {
   /// student the class.
   /// [classID] is the class_id of the class to take attendance for.
   /// [classDate] is the date of the class meeting.
-  void _takeAttendance(int classID, String classDate) async {
+  /// Return true if the class meeting was successfully added.
+  /// Return false if the class meeting already exists.
+  Future<bool> _takeAttendance(int classID, String classDate) async {
     DatabaseHelper dbHelper = DatabaseHelper();
     // Check if the class meeting date already exists.
     if (await dbHelper.duplicateClassDate(classID, classDate)) {
@@ -391,6 +408,7 @@ class Home extends State<MyHomePage> {
           },
         );
       }
+      return false;
     } else {
       Result meetingIDResult =
           await dbHelper.addClassMeeting(classID, classDate);
@@ -400,6 +418,7 @@ class Home extends State<MyHomePage> {
       for (var index = 0; index < students.length; index++) {
         dbHelper.addStudentAttendance(students[index], meetingID, classID, 0);
       }
+      return true;
     }
   }
 
@@ -660,7 +679,7 @@ class Home extends State<MyHomePage> {
                                                   backgroundColor: primaryColor,
                                                 ),
                                                 child: const Text(
-                                                    'Take attendance',
+                                                    'Add class session',
                                                     style: bodyText),
                                               ),
                                             )

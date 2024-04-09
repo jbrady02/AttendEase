@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -9,32 +11,34 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: QRCodePage(),
+      home: const QRCodePage(),
     );
   }
 }
 
 class QRCodePage extends StatelessWidget {
   // URL to form for adding users to the class
-  final String formURL = "https://form-url.com";
+  final String formURL = "https://example.com";
+
+  const QRCodePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('QR Code Generator'),
+        title: const Text('QR Code Generator'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            QrImage(
+            QrImageView(
               data: formURL,
               version: QrVersions.auto,
               size: 200.0,
             ),
-            SizedBox(height: 20.0),
-            Text(
+            const SizedBox(height: 20.0),
+            const Text(
               'Scan the QR code to join the class!',
               style: TextStyle(fontSize: 20.0),
               textAlign: TextAlign.center,
