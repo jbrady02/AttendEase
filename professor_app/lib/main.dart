@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:postgres/postgres.dart';
 import 'package:professor_app/edit_class_add_student.dart';
 import 'package:professor_app/edit_class_remove_student.dart';
+import 'package:professor_app/login.dart';
 import 'package:professor_app/qr_code.dart';
 import 'class_information.dart';
 import 'database_helper.dart';
@@ -28,15 +29,13 @@ class MyApp extends StatelessWidget {
         dragDevices: PointerDeviceKind.values.toSet(),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Your classes'),
+      home: const Login(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => Home();
@@ -553,16 +552,16 @@ class Home extends State<MyHomePage> {
   /// This method is rerun every time setState is called.
   @override
   Widget build(BuildContext context) {
-    verifyDatabaseTables(); // Create database tables if they don't exist.
     return FutureBuilder(
         future: getClassList(),
         builder: (context, snapshot) {
+          verifyDatabaseTables(); // Create database tables if they don't exist.
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While waiting, display a loading indicator.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: Text(widget.title),
+                title: const Text('Your classes'),
               ),
               body: const Center(child: CircularProgressIndicator()),
             );
@@ -571,7 +570,7 @@ class Home extends State<MyHomePage> {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: Text(widget.title),
+                title: const Text('Your classes'),
               ),
               body: const Center(
                   child: Text(
@@ -640,7 +639,7 @@ class Home extends State<MyHomePage> {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: Text(widget.title),
+                title: const Text('Your classes'),
               ),
               body: TwoDimensionalGridView(
                   diagonalDragBehavior: DiagonalDragBehavior.free,
@@ -678,8 +677,7 @@ class Home extends State<MyHomePage> {
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: primaryColor,
                                                 ),
-                                                child: const Text(
-                                                    'Add session',
+                                                child: const Text('Add session',
                                                     style: bodyText),
                                               ),
                                             )

@@ -5,20 +5,55 @@ import 'package:postgres/postgres.dart';
 import 'package:professor_app/student.dart';
 
 class DatabaseHelper {
+  Future<bool> correctCredentials(String ip, String database, int port,
+      String username, String password) async {
+    try {
+      // See if the connection is successful.
+      await Connection.open(
+        Endpoint(
+          host: ip,
+          database: database,
+          port: port,
+          username: username,
+          password: password,
+        ),
+        settings: const ConnectionSettings(sslMode: SslMode.disable),
+      );
+      // If the connection is successful save the credentials and return true.
+      Directory('${Directory.current.path}\\config').createSync();
+      File saveIp = File('${Directory.current.path}\\config\\ip.txt');
+      File saveDatabase = File('${Directory.current.path}\\config\\database.txt');
+      File savePort = File('${Directory.current.path}\\config\\port.txt');
+      File saveUsername = File('${Directory.current.path}\\config\\username.txt');
+      File savePassword = File('${Directory.current.path}\\config\\password.txt');
+      // Overwrite the saveIp file with the new ip. Do it.
+      saveIp.writeAsStringSync(ip);
+      saveDatabase.writeAsStringSync(database);
+      savePort.writeAsStringSync(port.toString());
+      saveUsername.writeAsStringSync(username);
+      savePassword.writeAsStringSync(password);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<Connection> connectToDatabase() async {
+    // Get the saved credentials from the files.
+    Directory('${Directory.current.path}\\config').createSync();
+    String ip = File('${Directory.current.path}\\config\\ip.txt').readAsStringSync();
+    String database = File('${Directory.current.path}\\config\\database.txt').readAsStringSync();
+    int port = int.parse(File('${Directory.current.path}\\config\\port.txt').readAsStringSync());
+    String username = File('${Directory.current.path}\\config\\username.txt').readAsStringSync();
+    String password = File('${Directory.current.path}\\config\\password.txt').readAsStringSync();
+    // Connec to the database.
     final conn = await Connection.open(
       Endpoint(
-        host: kIsWeb ||
-                Platform.isWindows ||
-                Platform.isLinux ||
-                Platform.isMacOS ||
-                Platform.isFuchsia
-            ? 'localhost'
-            : '10.0.2.2', // Android localhost is different.
-        database: 'postgres',
-        port: 5432,
-        username: 'postgres',
-        password: getPassword(), // Insert password here.
+        host: ip,
+        database: database,
+        port: port,
+        username: username,
+        password: password,
       ),
       // The postgres server hosted locally doesn't have SSL by default. If you're
       // accessing a postgres server over the Internet, the server should support
@@ -390,7 +425,7 @@ class DatabaseHelper {
   }
 
   /// Check if the class meeting date is a duplicate.
-  /// 
+  ///
   /// [classID] is the class_id of the class.
   /// [date] is the date of the class meeting.
   /// Return true if the date is a duplicate, false if unique.

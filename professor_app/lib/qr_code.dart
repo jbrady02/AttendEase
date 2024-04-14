@@ -22,10 +22,14 @@ class QRCodePage extends StatelessWidget {
 
   const QRCodePage({super.key});
 
+  // Theme
+  static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: primaryColor,
         title: const Text('QR Code Generator'),
       ),
       body: Center(
