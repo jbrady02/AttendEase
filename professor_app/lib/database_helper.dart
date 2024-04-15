@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:postgres/postgres.dart';
 import 'package:professor_app/student.dart';
 
@@ -22,10 +20,13 @@ class DatabaseHelper {
       // If the connection is successful save the credentials and return true.
       Directory('${Directory.current.path}\\config').createSync();
       File saveIp = File('${Directory.current.path}\\config\\ip.txt');
-      File saveDatabase = File('${Directory.current.path}\\config\\database.txt');
+      File saveDatabase =
+          File('${Directory.current.path}\\config\\database.txt');
       File savePort = File('${Directory.current.path}\\config\\port.txt');
-      File saveUsername = File('${Directory.current.path}\\config\\username.txt');
-      File savePassword = File('${Directory.current.path}\\config\\password.txt');
+      File saveUsername =
+          File('${Directory.current.path}\\config\\username.txt');
+      File savePassword =
+          File('${Directory.current.path}\\config\\password.txt');
       // Overwrite the saveIp file with the new ip. Do it.
       saveIp.writeAsStringSync(ip);
       saveDatabase.writeAsStringSync(database);
@@ -41,11 +42,16 @@ class DatabaseHelper {
   Future<Connection> connectToDatabase() async {
     // Get the saved credentials from the files.
     Directory('${Directory.current.path}\\config').createSync();
-    String ip = File('${Directory.current.path}\\config\\ip.txt').readAsStringSync();
-    String database = File('${Directory.current.path}\\config\\database.txt').readAsStringSync();
-    int port = int.parse(File('${Directory.current.path}\\config\\port.txt').readAsStringSync());
-    String username = File('${Directory.current.path}\\config\\username.txt').readAsStringSync();
-    String password = File('${Directory.current.path}\\config\\password.txt').readAsStringSync();
+    String ip =
+        File('${Directory.current.path}\\config\\ip.txt').readAsStringSync();
+    String database = File('${Directory.current.path}\\config\\database.txt')
+        .readAsStringSync();
+    int port = int.parse(
+        File('${Directory.current.path}\\config\\port.txt').readAsStringSync());
+    String username = File('${Directory.current.path}\\config\\username.txt')
+        .readAsStringSync();
+    String password = File('${Directory.current.path}\\config\\password.txt')
+        .readAsStringSync();
     // Connec to the database.
     final conn = await Connection.open(
       Endpoint(
@@ -443,7 +449,7 @@ class DatabaseHelper {
   void makeUnknownDataAbsentUnexcused(int classID) async {
     Connection conn = await connectToDatabase();
     await conn.execute(
-      '''UPDATE student_attendance SET attendance = 2 
+      '''UPDATE student_attendance SET attendance = 3 
         WHERE class_id = \$1 AND attendance = 0''',
       parameters: [classID],
     );

@@ -308,7 +308,7 @@ class Home extends State<MyHomePage> {
                     maxLength: 10,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Class meeting date',
+                      labelText: 'Format: YYYY-MM-DD',
                     ),
                   ),
                 ),

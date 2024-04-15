@@ -53,6 +53,20 @@ class ClassInformation extends StatelessWidget {
     }
   }
 
+  String _getPercentAttended(List<int> attendance) {
+    int presentCount = 0;
+    for (int index in attendance) {
+      if (index == present) {
+        presentCount++;
+      }
+    }
+    if (attendance.isEmpty) {
+      return 'N/A';
+    } else {
+      return '${(presentCount / attendance.length * 100).round()}%';
+    }
+  }
+
   /// Get a Color object determined by [attendanceInt].
   ///
   /// [attendanceInt] is the integer value from the database.
@@ -105,7 +119,8 @@ class ClassInformation extends StatelessWidget {
               '${students.keys.toList()[nameIndex].surname} '
               'on ${classDates[dateIndex]}'),
           children: [
-            Container( // Button to record student as present.
+            Container(
+              // Button to record student as present.
               color: Colors.green,
               child: SimpleDialogOption(
                 onPressed: () {
@@ -123,7 +138,8 @@ class ClassInformation extends StatelessWidget {
                         : const Text('Present', style: bodyText),
               ),
             ),
-            Container( // Button to record student as absent and excused.
+            Container(
+              // Button to record student as absent and excused.
               color: Colors.orange,
               child: SimpleDialogOption(
                 onPressed: () {
@@ -142,7 +158,8 @@ class ClassInformation extends StatelessWidget {
                         : const Text('Absent and excused', style: bodyText),
               ),
             ),
-            Container( // Button to record student as absent and unexcused.
+            Container(
+              // Button to record student as absent and unexcused.
               color: Colors.orange,
               child: SimpleDialogOption(
                 onPressed: () {
@@ -161,7 +178,8 @@ class ClassInformation extends StatelessWidget {
                         : const Text('Absent and unexcused', style: bodyText),
               ),
             ),
-            Container( // Button to record student as tardy and excused.
+            Container(
+              // Button to record student as tardy and excused.
               color: Colors.yellow,
               child: SimpleDialogOption(
                 onPressed: () {
@@ -180,7 +198,8 @@ class ClassInformation extends StatelessWidget {
                         : const Text('Tardy and excused', style: bodyText),
               ),
             ),
-            Container( // Button to record student as tardy and unexcused.
+            Container(
+              // Button to record student as tardy and unexcused.
               color: Colors.yellow,
               child: SimpleDialogOption(
                 onPressed: () {
@@ -199,13 +218,14 @@ class ClassInformation extends StatelessWidget {
                         : const Text('Tardy and unexcused', style: bodyText),
               ),
             ),
-            SimpleDialogOption( // Button to make student attendance unknown.
+            SimpleDialogOption(
+              // Button to make student attendance unknown.
               onPressed: () {
                 DatabaseHelper dbHelper = DatabaseHelper();
-                  dbHelper.editStudentAttendance(
-                      students.values.toList()[nameIndex][dateIndex].studentID,
-                      students.values.toList()[nameIndex][dateIndex].meetingID,
-                      unknown);
+                dbHelper.editStudentAttendance(
+                    students.values.toList()[nameIndex][dateIndex].studentID,
+                    students.values.toList()[nameIndex][dateIndex].meetingID,
+                    unknown);
                 Navigator.pop(context, unknown);
               },
               child:
@@ -377,7 +397,7 @@ class ClassInformation extends StatelessWidget {
               body: TwoDimensionalGridView(
                 diagonalDragBehavior: DiagonalDragBehavior.free,
                 delegate: TwoDimensionalChildBuilderDelegate(
-                    maxXIndex: students.values.first.length,
+                    maxXIndex: students.values.first.length + 1,
                     maxYIndex: students.length,
                     builder: (BuildContext context, ChildVicinity vicinity) {
                       return SizedBox(
@@ -406,31 +426,86 @@ class ClassInformation extends StatelessWidget {
                                             textAlign: TextAlign.center),
                                       )
                                     : (vicinity.yIndex == 0)
-                                        ? Center(
-                                            child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 13, right: 13),
-                                            child: Text(
-                                                // Date
-                                                classDates[vicinity.xIndex - 1],
-                                                style: smallBodyText,
-                                                textAlign: TextAlign.center),
-                                          ))
-                                        : SizedBox(
-                                            width: 70,
-                                            child: OutlinedButton(
-                                              // Attendance
-                                              onPressed: () {
-                                                _showSelectionDialog(
-                                                    context,
-                                                    vicinity.yIndex - 1,
-                                                    vicinity.xIndex - 1,
-                                                    students,
-                                                    classDates);
-                                              },
-                                              style: OutlinedButton.styleFrom(
-                                                  side: BorderSide(
-                                                      color: _getOutlineColor(
+                                        ? (vicinity.xIndex ==
+                                                students.values.first.length +
+                                                    1) // Percent attended
+                                            ? const Center(
+                                                child: Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 13, right: 13),
+                                                child: Text('%',
+                                                    style: bodyText,
+                                                    textAlign:
+                                                        TextAlign.center),
+                                              ))
+                                            : Center(
+                                                child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 13, right: 13),
+                                                child: Text(
+                                                    // Date
+                                                    classDates[
+                                                        vicinity.xIndex - 1],
+                                                    style: smallBodyText,
+                                                    textAlign:
+                                                        TextAlign.center),
+                                              ))
+                                        : (vicinity.xIndex ==
+                                                students.values.first.length +
+                                                    1) // Percent attended
+                                            ? (Center(
+                                                child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 13, right: 13),
+                                                child: Text(
+                                                    _getPercentAttended(
+                                                        // Get attendance.
+                                                        students.values
+                                                            .toList()[vicinity
+                                                                    .yIndex -
+                                                                1]
+                                                            .map((e) =>
+                                                                e.attendance)
+                                                            .toList()),
+                                                    style: smallBodyText,
+                                                    textAlign:
+                                                        TextAlign.center),
+                                              )))
+                                            : SizedBox(
+                                                width: 70,
+                                                child: OutlinedButton(
+                                                  // Attendance
+                                                  onPressed: () {
+                                                    _showSelectionDialog(
+                                                        context,
+                                                        vicinity.yIndex - 1,
+                                                        vicinity.xIndex - 1,
+                                                        students,
+                                                        classDates);
+                                                  },
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                          side: BorderSide(
+                                                              color: _getOutlineColor(students
+                                                                  .values
+                                                                  .toList()[vicinity.yIndex - 1]
+                                                                      [
+                                                                      vicinity.xIndex -
+                                                                          1]
+                                                                  .attendance),
+                                                              width:
+                                                                  3), // Set the border color.
+                                                          backgroundColor:
+                                                              _getColor(students
+                                                                  .values
+                                                                  .toList()[
+                                                                      vicinity.yIndex - 1]
+                                                                      [vicinity.xIndex - 1]
+                                                                  .attendance)),
+                                                  // Set the background color.
+                                                  child: Text(
+                                                      _getAttendance(
+                                                          // Get attendance value.
                                                           students.values
                                                               .toList()[vicinity
                                                                       .yIndex -
@@ -438,27 +513,9 @@ class ClassInformation extends StatelessWidget {
                                                                       .xIndex -
                                                                   1]
                                                               .attendance),
-                                                      width:
-                                                          3), // Set the border color.
-                                                  backgroundColor: _getColor(students
-                                                      .values
-                                                      .toList()[vicinity.yIndex - 1]
-                                                          [vicinity.xIndex - 1]
-                                                      .attendance)),
-                                              // Set the background color.
-                                              child: Text(
-                                                  _getAttendance(
-                                                      // Get attendance value.
-                                                      students.values
-                                                          .toList()[
-                                                              vicinity.yIndex -
-                                                                  1][
-                                                              vicinity.xIndex -
-                                                                  1]
-                                                          .attendance),
-                                                  style: smallBodyText),
-                                            ),
-                                          ),
+                                                      style: smallBodyText),
+                                                ),
+                                              ),
                           ));
                     }),
               ),
