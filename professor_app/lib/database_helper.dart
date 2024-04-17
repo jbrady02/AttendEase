@@ -1,8 +1,17 @@
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:postgres/postgres.dart';
 import 'package:professor_app/student.dart';
 
 class DatabaseHelper {
+  /// Check if the credentials are correct.
+  ///
+  /// [ip] is the IP address of the database.
+  /// [database] is the name of the database.
+  /// [port] is the port of the database.
+  /// [username] is the username for the database.
+  /// [password] is the password for the database.
+  /// Return true if the credentials are correct, false otherwise.
   Future<bool> correctCredentials(String ip, String database, int port,
       String username, String password) async {
     try {
@@ -17,41 +26,55 @@ class DatabaseHelper {
         ),
         settings: const ConnectionSettings(sslMode: SslMode.disable),
       );
-      // If the connection is successful save the credentials and return true.
-      Directory('${Directory.current.path}\\config').createSync();
-      File saveIp = File('${Directory.current.path}\\config\\ip.txt');
-      File saveDatabase =
-          File('${Directory.current.path}\\config\\database.txt');
-      File savePort = File('${Directory.current.path}\\config\\port.txt');
-      File saveUsername =
-          File('${Directory.current.path}\\config\\username.txt');
-      File savePassword =
-          File('${Directory.current.path}\\config\\password.txt');
-      // Overwrite the saveIp file with the new ip. Do it.
+      String path = await getPath();
+      // Create files if it does not exist
+      Directory('$path/config').createSync();
+      File('$path/config/ip.txt').createSync();
+      File('$path/config/database.txt').createSync();
+      File('$path/config/port.txt').createSync();
+      File('$path/config/username.txt').createSync();
+      File('$path/config/password.txt').createSync();
+      // Save the credentials to files.
+      File saveIp = File('$path/config/ip.txt');
+      File saveDatabase = File('$path/config/database.txt');
+      File savePort = File('$path/config/port.txt');
+      File saveUsername = File('$path/config/username.txt');
+      File savePassword = File('$path/config/password.txt');
       saveIp.writeAsStringSync(ip);
       saveDatabase.writeAsStringSync(database);
       savePort.writeAsStringSync(port.toString());
       saveUsername.writeAsStringSync(username);
       savePassword.writeAsStringSync(password);
+
       return true;
     } catch (e) {
       return false;
     }
   }
 
+  /// Get the path of the application's documents directory.
+  /// 
+  /// Return the path of the application's documents directory.
+  Future<String> getPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  /// Connect to the database
   Future<Connection> connectToDatabase() async {
-    // Get the saved credentials from the files.
-    Directory('${Directory.current.path}\\config').createSync();
-    String ip =
-        File('${Directory.current.path}\\config\\ip.txt').readAsStringSync();
-    String database = File('${Directory.current.path}\\config\\database.txt')
-        .readAsStringSync();
-    int port = int.parse(
-        File('${Directory.current.path}\\config\\port.txt').readAsStringSync());
-    String username = File('${Directory.current.path}\\config\\username.txt')
-        .readAsStringSync();
-    String password = File('${Directory.current.path}\\config\\password.txt')
-        .readAsStringSync();
+    String path = await getPath();
+    // Create files if it does not exist
+    Directory('$path/config').createSync();
+    File('$path/config/ip.txt').createSync();
+    File('$path/config/database.txt').createSync();
+    File('$path/config/port.txt').createSync();
+    File('$path/config/username.txt').createSync();
+    File('$path/config/password.txt').createSync();
+    String ip = File('$path/config/ip.txt').readAsStringSync();
+    String database = File('$path/config/database.txt').readAsStringSync();
+    int port = int.parse(File('$path/config/port.txt').readAsStringSync());
+    String username = File('$path/config/username.txt').readAsStringSync();
+    String password = File('$path/config/password.txt').readAsStringSync();
     // Connec to the database.
     final conn = await Connection.open(
       Endpoint(
@@ -67,16 +90,6 @@ class DatabaseHelper {
       settings: const ConnectionSettings(sslMode: SslMode.disable),
     );
     return conn;
-  }
-
-  /// Return the password from a file.
-  String getPassword() {
-    File file = File('${Directory.current.path}\\lib\\password.txt');
-    if (file.existsSync()) {
-      return file.readAsStringSync();
-    } else {
-      return 'Password not found';
-    }
   }
 
   /// Create database tables if they don't exist.

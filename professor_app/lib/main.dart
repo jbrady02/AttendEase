@@ -291,11 +291,12 @@ class Home extends State<MyHomePage> {
   /// [className] is the name of the class to take attendance for.
   void _takeAttendanceDialog(int classID, String className) {
     var classDateTextField = TextEditingController();
+    var formURLTextField = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            title: const Text('What day is this class meeting?',
+            title: const Text('Enter the class session date and form URL',
                 textAlign: TextAlign.center),
             children: [
               Padding(
@@ -308,7 +309,22 @@ class Home extends State<MyHomePage> {
                     maxLength: 10,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Format: YYYY-MM-DD',
+                      labelText: 'Date (YYYY-MM-DD)',
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: formURLTextField,
+                    maxLength: 255,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Form URL',
                     ),
                   ),
                 ),
@@ -320,12 +336,13 @@ class Home extends State<MyHomePage> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: OutlinedButton(
                       onPressed: () async {
-                        if (classDateTextField.text.isNotEmpty) {
+                        if (classDateTextField.text.isNotEmpty &&
+                            formURLTextField.text.isNotEmpty) {
                           Navigator.pop(context);
                           // If successfully added a class meeting show QR code.
                           if (await _takeAttendance(
                               classID, classDateTextField.text)) {
-                            makeQrCode(classID, classDateTextField.text);
+                            makeQrCode(formURLTextField.text);
                           }
                           // Wait 250 ms for the database to update.
                           Future.delayed(const Duration(milliseconds: 250), () {
@@ -368,10 +385,10 @@ class Home extends State<MyHomePage> {
   ///
   /// [classID] is the class_id of the class to take attendance for.
   /// [classDate] is the date of the class meeting.
-  void makeQrCode(int classID, String classDate) {
+  void makeQrCode(String formURL){
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const QRCodePage()),
+      MaterialPageRoute(builder: (context) => QRCodePage(formURL)),
     );
   }
 

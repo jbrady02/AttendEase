@@ -1,26 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'QR Code Generator',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const QRCodePage(),
-    );
-  }
-}
-
 class QRCodePage extends StatelessWidget {
-  // URL to form for adding users to the class
-  final String formURL = "https://example.com";
+  final String formURL;
 
-  const QRCodePage({super.key});
+  const QRCodePage(this.formURL, {super.key});
 
   // Theme
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
