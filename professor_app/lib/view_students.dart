@@ -25,12 +25,12 @@ class Students extends StatelessWidget {
   /// 
   /// [customFields] is a list of the custom fields.
   void _addStudentDialog(BuildContext context, List<Student> customFields) {
-    var givenNameTextField = TextEditingController();
-    var surnameTextField = TextEditingController();
-    var customField1TextField = TextEditingController();
-    var customField2TextField = TextEditingController();
-    var customField3TextField = TextEditingController();
-    var customField4TextField = TextEditingController();
+    TextEditingController givenNameTextField = TextEditingController();
+    TextEditingController surnameTextField = TextEditingController();
+    TextEditingController customField1TextField = TextEditingController();
+    TextEditingController customField2TextField = TextEditingController();
+    TextEditingController customField3TextField = TextEditingController();
+    TextEditingController customField4TextField = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -225,7 +225,7 @@ class Students extends StatelessWidget {
       String surname,
       int studentID,
       bool isCustomField) {
-    var editStudentTextField = TextEditingController();
+    TextEditingController editStudentTextField = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {

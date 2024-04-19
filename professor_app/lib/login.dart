@@ -52,7 +52,7 @@ class Login extends StatelessWidget {
   }
 
   /// Test the user's credentials to make sure they are correct.
-  /// 
+  ///
   /// [ip] is the IP address of the database.
   /// [name] is the name of the database.
   /// [portString] is the port number of the database.
@@ -68,7 +68,7 @@ class Login extends StatelessWidget {
   }
 
   /// Get the path of the application's documents directory.
-  /// 
+  ///
   /// Return the path of the application's documents directory.
   Future<String> getPath() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -98,7 +98,7 @@ class Login extends StatelessWidget {
                           heroTag: 'license',
                           onPressed: () {
                             _showAboutDialog(
-                                context: context, applicationVersion: '0.0.0');
+                                context: context, applicationVersion: '1.0.0');
                           },
                           backgroundColor: primaryColor,
                           child: const Text('About', style: bodyText),
@@ -130,41 +130,37 @@ class Login extends StatelessWidget {
                     ]));
           } else {
             // Get the credentials from the files.
-            Directory('${snapshot.data}/config')
-                .createSync();
-            String ip =
-                File('${snapshot.data}/config/ip.txt').existsSync()
-                    ? File('${snapshot.data}/config/ip.txt')
-                        .readAsStringSync()
-                    : '';
+            Directory('${snapshot.data}/config').createSync();
+            String ip = File('${snapshot.data}/config/ip.txt').existsSync()
+                ? File('${snapshot.data}/config/ip.txt').readAsStringSync()
+                : '';
             String database =
-                File('${snapshot.data}/config/database.txt')
-                        .existsSync()
+                File('${snapshot.data}/config/database.txt').existsSync()
                     ? File('${snapshot.data}/config/database.txt')
                         .readAsStringSync()
                     : '';
-            String port =
-                File('${snapshot.data}/config/port.txt').existsSync()
-                    ? File('${snapshot.data}/config/port.txt')
-                        .readAsStringSync()
-                    : '';
+            String port = File('${snapshot.data}/config/port.txt').existsSync()
+                ? File('${snapshot.data}/config/port.txt').readAsStringSync()
+                : '';
             String username =
-                File('${snapshot.data}/config/username.txt')
-                        .existsSync()
+                File('${snapshot.data}/config/username.txt').existsSync()
                     ? File('${snapshot.data}/config/username.txt')
                         .readAsStringSync()
                     : '';
             String password =
-                File('${snapshot.data}/config/password.txt')
-                        .existsSync()
+                File('${snapshot.data}/config/password.txt').existsSync()
                     ? File('${snapshot.data}/config/password.txt')
                         .readAsStringSync()
                     : '';
-            var ipTextField = TextEditingController(text: ip);
-            var nameTextField = TextEditingController(text: database);
-            var portTextField = TextEditingController(text: port);
-            var usernameTextField = TextEditingController(text: username);
-            var passwordTextField = TextEditingController(text: password);
+            TextEditingController ipTextField = TextEditingController(text: ip);
+            TextEditingController nameTextField =
+                TextEditingController(text: database);
+            TextEditingController portTextField =
+                TextEditingController(text: port);
+            TextEditingController usernameTextField =
+                TextEditingController(text: username);
+            TextEditingController passwordTextField =
+                TextEditingController(text: password);
             return Scaffold(
                 appBar: AppBar(
                   backgroundColor: primaryColor,

@@ -4,9 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:postgres/postgres.dart';
 import 'package:professor_app/edit_class_add_student.dart';
 import 'package:professor_app/edit_class_remove_student.dart';
+import 'package:professor_app/import_form_data.dart';
 import 'package:professor_app/login.dart';
 import 'package:professor_app/qr_code.dart';
 import 'class_information.dart';
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Professor Attendance App',
+      title: 'AttendEase',
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: PointerDeviceKind.values.toSet(),
       ),
@@ -90,7 +92,7 @@ class Home extends State<MyHomePage> {
 
   /// Dialog to add a class to the classes table.
   void _addClassDialog(BuildContext context) {
-    var classNameTextField = TextEditingController();
+    TextEditingController classNameTextField = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -233,6 +235,20 @@ class Home extends State<MyHomePage> {
                 child: const Text('Remove a student', style: bodyText)),
             SimpleDialogOption(
                 onPressed: () {
+                  _makeFormDialog(context, classID);
+                },
+                child: const Text('Make form', style: bodyText)),
+            SimpleDialogOption(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ImportFormData(classID)),
+                  );
+                },
+                child: const Text('Import form data', style: bodyText)),
+            SimpleDialogOption(
+                onPressed: () {
                   _renameClassDialog(context, classID);
                 },
                 child: const Text('Rename class', style: bodyText)),
@@ -290,8 +306,8 @@ class Home extends State<MyHomePage> {
   /// [classID] is the class_id of the class to take attendance for.
   /// [className] is the name of the class to take attendance for.
   void _takeAttendanceDialog(int classID, String className) {
-    var classDateTextField = TextEditingController();
-    var formURLTextField = TextEditingController();
+    TextEditingController classDateTextField = TextEditingController();
+    TextEditingController formURLTextField = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -385,7 +401,7 @@ class Home extends State<MyHomePage> {
   ///
   /// [classID] is the class_id of the class to take attendance for.
   /// [classDate] is the date of the class meeting.
-  void makeQrCode(String formURL){
+  void makeQrCode(String formURL) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => QRCodePage(formURL)),
@@ -456,11 +472,40 @@ class Home extends State<MyHomePage> {
     return (dbHelper.getClasses());
   }
 
+  /// Copy class data to the clipboard and display a dialog.
+  ///
+  /// The user copies the displayed text into their form.
+  /// [classID] is the class_id of the class to create a form for.
+  Future<void> _makeFormDialog(BuildContext context, int classID) async {
+    // For loop, get givenName and surName for each student in classID followed by studentID
+    DatabaseHelper dbHelper = DatabaseHelper();
+    String classData = await dbHelper.getStudentsInClass(classID);
+    Clipboard.setData(ClipboardData(text: classData));
+    showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Class data has been copied to the clipboard.'),
+            content:
+                const Text('Paste the data into your form.', style: bodyText),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        });
+  }
+
   /// Dialog to update a class_name in the classes table.
   ///
   /// [classID] is the class_id of the class to be renamed.
   void _renameClassDialog(BuildContext context, int classID) {
-    var classNameTextField = TextEditingController();
+    TextEditingController classNameTextField = TextEditingController();
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -640,7 +685,7 @@ class Home extends State<MyHomePage> {
                       heroTag: 'license',
                       onPressed: () {
                         _showAboutDialog(
-                            context: context, applicationVersion: '0.0.0');
+                            context: context, applicationVersion: '1.0.0');
                       },
                       backgroundColor: primaryColor,
                       child: const Text('About', style: bodyText),
@@ -818,7 +863,7 @@ class Home extends State<MyHomePage> {
                       heroTag: 'license',
                       onPressed: () {
                         _showAboutDialog(
-                            context: context, applicationVersion: '0.0.0');
+                            context: context, applicationVersion: '1.0.0');
                       },
                       backgroundColor: primaryColor,
                       child: const Text('About', style: bodyText),

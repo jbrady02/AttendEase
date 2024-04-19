@@ -45,7 +45,6 @@ class DatabaseHelper {
       savePort.writeAsStringSync(port.toString());
       saveUsername.writeAsStringSync(username);
       savePassword.writeAsStringSync(password);
-
       return true;
     } catch (e) {
       return false;
@@ -53,7 +52,7 @@ class DatabaseHelper {
   }
 
   /// Get the path of the application's documents directory.
-  /// 
+  ///
   /// Return the path of the application's documents directory.
   Future<String> getPath() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -163,6 +162,20 @@ class DatabaseHelper {
     return results;
   }
 
+  /// Get the class sessions in a class.
+  ///
+  /// [classID] is the requested class_id.
+  /// Return the class sessions with a matching [class_id].
+  Future<Result> getClassSessions(int classID) async {
+    Connection conn = await connectToDatabase();
+    final Result results = await conn.execute(
+      'SELECT meeting_id, date FROM class_meetings WHERE class_id = \$1',
+      parameters: [classID],
+    );
+    await conn.close();
+    return results;
+  }
+
   /// Get the students in a class from the classes table.
   ///
   /// [classID] is the requested class_id.
@@ -218,6 +231,27 @@ class DatabaseHelper {
             row[5] as String,
             row[6] as String))
         .toList();
+  }
+
+  /// Get all students that appear in [classID].
+  ///
+  /// [classID] is the class_id of the class.
+  /// Return a string of the students in the class.
+  Future<String> getStudentsInClass(int classID) async {
+    Connection conn = await connectToDatabase();
+    final Result results = await conn.execute('''SELECT given_name, surname,
+    student_id FROM students WHERE student_id = ANY(SELECT unnest(students) 
+    FROM classes WHERE class_id = \$1) ORDER BY surname ASC''',
+        parameters: [classID]);
+    await conn.close();
+    // Format the results to 'given_name surname [classID]'
+    List<String> students = [];
+    for (var row in results) {
+      students.add('${row[0]} ${row[1]} [${row[2]}]');
+    }
+    // Convert the list to a string.
+    String studentsString = students.join('\n');
+    return studentsString;
   }
 
   /// Add a student to the students table.
@@ -429,6 +463,19 @@ class DatabaseHelper {
         WHERE student_id = \$2 AND meeting_id = \$3''',
       parameters: [attendance, studentID, meetingID],
     );
+    await conn.close();
+  }
+
+  /// Mark students as present if they appear in formCSV.
+  ///
+  /// [classID] is the class_id of the class.
+  /// [sessionID] is the meeting_id of the class meeting.
+  /// [formList] is a list of student_ids to mark as present.
+  void importFormData(int sessionID, int classID, List<int> formList) async {
+    Connection conn = await connectToDatabase();
+    await conn.execute('''UPDATE student_attendance SET attendance = 1 
+      WHERE meeting_id = \$1 AND class_id = \$2 AND student_id = ANY(\$3)''',
+        parameters: [sessionID, classID, formList]);
     await conn.close();
   }
 

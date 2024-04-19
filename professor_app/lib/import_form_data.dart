@@ -5,12 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:postgres/postgres.dart';
 import 'package:professor_app/database_helper.dart';
-import 'package:professor_app/student.dart';
 
-class EditClassAddStudent extends StatelessWidget {
+class ImportFormData extends StatelessWidget {
   final int classID;
 
-  const EditClassAddStudent(this.classID, {super.key});
+  const ImportFormData(this.classID, {super.key});
 
   // Theme
   static const TextStyle bodyText = TextStyle(
@@ -19,23 +18,6 @@ class EditClassAddStudent extends StatelessWidget {
   );
 
   static const Color primaryColor = Color.fromARGB(255, 255, 100, 100);
-
-  Future<Map<List<Student>, Result>> getAllStudentsAndClass(int classID) async {
-    DatabaseHelper dbHelper = DatabaseHelper();
-    List<Student> students = await dbHelper.getStudents();
-    Result classResult = await dbHelper.getClass(classID);
-    return {students: classResult};
-  }
-
-  /// Adds a student to a class.
-  ///
-  /// This method takes in a [studentID] and adds the student to the class.
-  /// identified by [classID]. It uses the [DatabaseHelper] class to perform.
-  /// the database operation asynchronously.
-  void addStudentToClass(int studentID) async {
-    DatabaseHelper dbHelper = DatabaseHelper();
-    dbHelper.addStudentToClass(classID, studentID);
-  }
 
   /// Reload the page and pop the page [numPops] times.
   Future<void> reload(BuildContext context, numPops) async {
@@ -52,24 +34,114 @@ class EditClassAddStudent extends StatelessWidget {
     });
   }
 
-  /// Get the class information for the class with ID [classID].
-  Future<Result> getClass(int classID) async {
+  /// Get the class information from the classes record with [classID].
+  Future<Result> getClassSessions(int classID) async {
     DatabaseHelper dbHelper = DatabaseHelper();
-    return (await dbHelper.getClass(classID));
+    return (await dbHelper.getClassSessions(classID));
+  }
+
+  /// Import the form data into the database.
+  ///
+  /// [classID] is the ID of the class to import the data into.
+  /// [sessionID] is the ID of the class session to import the data into.
+  /// [formCSV] is the CSV data to import.
+  void importForm(
+      BuildContext context, int classID, int sessionID, String formCSV) async {
+    // Remove all non-numeric characters except for ']' from the CSV.
+    formCSV = formCSV.replaceAll(RegExp(r'[^0-9\]]'), '');
+    // If formCSV ends with a ']', remove it.
+    if (formCSV.endsWith(']')) {
+      formCSV = formCSV.substring(0, formCSV.length - 1);
+    }
+    // Convert formCSV to a list of integers separated by commas.
+    List<int> formList = formCSV.split(']').map(int.parse).toList();
+    DatabaseHelper dbHelper = DatabaseHelper();
+    dbHelper.importFormData(sessionID, classID, formList);
+  }
+
+  /// Show a dialog with a text input for the attendance data.
+  ///
+  /// [classID] is the ID of the class to import the data into.
+  /// [sessionID] is the ID of the class session to import the data into.
+  void showImportDialog(BuildContext context, int classID, int sessionID) {
+    TextEditingController importFormTextField = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Import form data', textAlign: TextAlign.center),
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: 200,
+                  child: TextField(
+                    controller: importFormTextField,
+                    maxLength: 100000,
+                    minLines: 1,
+                    maxLines: 10,
+                    keyboardType: TextInputType.text,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Form output CSV',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 75,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: OutlinedButton(
+                      onPressed: () {
+                        if (importFormTextField.text.isNotEmpty) {
+                          importForm(context, classID, sessionID,
+                              importFormTextField.text);
+                          reload(context, 3);
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title:
+                                      const Text('The value can not be empty.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      child: const Text('Import form data', style: bodyText)),
+                ),
+              ),
+            ],
+          );
+        });
   }
 
   /// Build the widget.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<List<Student>, Result>>(
-        future: getAllStudentsAndClass(classID),
+    return FutureBuilder<Result>(
+        future: getClassSessions(classID),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While waiting, display a loading indicator.
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: const Text('Add a student to'),
+                title: const Text('Select a class session to import data into'),
               ),
               body: const Center(child: CircularProgressIndicator()),
             );
@@ -78,7 +150,7 @@ class EditClassAddStudent extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: const Text('Add a student to'),
+                title: const Text('Select a class session to import data into'),
               ),
               body: const Center(
                   child: Text(
@@ -88,36 +160,33 @@ class EditClassAddStudent extends StatelessWidget {
               )),
             );
           } else {
-            // Future object found; display students.
-            List<Student>? students = snapshot.data!.keys.first
-                .where((student) => student.studentID != 0)
-                .toList();
-            List<dynamic>? classInfo = snapshot.data!.values.first[0];
-            if (classInfo[2] == null) {
-            } else {
-              for (int i = 0; i < students.length; i++) {
-                if (classInfo[2].contains(students[i].studentID)) {
-                  students.removeAt(i);
-                  i--; // Decrement i to account for the removed element.
-                }
-              }
+            // Future object found; display class sessions.
+            // Convert result to Map.
+            List<int> sessionIDs = [];
+            List<String> sessionDates = [];
+            for (int index = 0; index < snapshot.data!.length; index++) {
+              sessionIDs.add(snapshot.data![index][0] as int);
+              sessionDates.add(snapshot.data![index][1] as String);
             }
+            Map<int, String> classSessions =
+                Map.fromIterables(sessionIDs, sessionDates);
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: primaryColor,
-                title: Text('Add a student to ${classInfo[1]}'),
+                title: const Text('Select a class session to import data into'),
               ),
-              body: (students.length - 1 < 0) // Message if no students found.
+              body: (classSessions.length - 1 <
+                      0) // Message if no students found.
                   ? const Center(
                       child: Text(
-                      'No students that are not already in the class were found.',
+                      'No class sessions were found for this class.',
                       style: bodyText,
                       textAlign: TextAlign.center,
                     ))
                   : TwoDimensionalGridView(
                       delegate: TwoDimensionalChildBuilderDelegate(
                           maxXIndex: 0,
-                          maxYIndex: students.length - 1,
+                          maxYIndex: classSessions.length - 1,
                           builder:
                               (BuildContext context, ChildVicinity vicinity) {
                             return SizedBox(
@@ -125,15 +194,18 @@ class EditClassAddStudent extends StatelessWidget {
                               child: Center(
                                   child: ElevatedButton(
                                 onPressed: () {
-                                  addStudentToClass(
-                                      students[vicinity.yIndex].studentID);
-                                  reload(context, 2);
+                                  showImportDialog(
+                                      context,
+                                      classID,
+                                      classSessions.keys
+                                          .elementAt(vicinity.yIndex));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: primaryColor,
                                 ),
                                 child: Text(
-                                  '${students[vicinity.yIndex].givenName} ${students[vicinity.yIndex].surname}',
+                                  classSessions.values
+                                      .elementAt(vicinity.yIndex),
                                   style: bodyText,
                                   textAlign: TextAlign.center,
                                 ),
