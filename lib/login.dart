@@ -121,7 +121,7 @@ class Login extends StatelessWidget {
                           heroTag: 'license',
                           onPressed: () {
                             _showAboutDialog(
-                                context: context, applicationVersion: '0.0.0');
+                                context: context, applicationVersion: '1.0.0');
                           },
                           backgroundColor: primaryColor,
                           child: const Text('About', style: bodyText),
@@ -318,7 +318,7 @@ class Login extends StatelessWidget {
                         heroTag: 'license',
                         onPressed: () {
                           _showAboutDialog(
-                              context: context, applicationVersion: '0.0.0');
+                              context: context, applicationVersion: '1.0.0');
                         },
                         backgroundColor: primaryColor,
                         child: const Text('About', style: bodyText),
