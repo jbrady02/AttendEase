@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:postgres/postgres.dart';
-import 'package:professor_app/database_helper.dart';
+import 'package:attend_ease/database_helper.dart';
 
 class ImportFormData extends StatelessWidget {
   final int classID;

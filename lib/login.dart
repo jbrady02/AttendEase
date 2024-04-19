@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:professor_app/database_helper.dart';
-import 'package:professor_app/main.dart';
+import 'package:attend_ease/database_helper.dart';
+import 'package:attend_ease/main.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Login extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:postgres/postgres.dart';
-import 'package:professor_app/student.dart';
+import 'package:attend_ease/student.dart';
 
 class DatabaseHelper {
   /// Check if the credentials are correct.

@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:professor_app/attendance.dart';
-import 'package:professor_app/database_helper.dart';
-import 'package:professor_app/student.dart';
+import 'package:attend_ease/attendance.dart';
+import 'package:attend_ease/database_helper.dart';
+import 'package:attend_ease/student.dart';
 
 class ClassInformation extends StatelessWidget {
   final int classID;
