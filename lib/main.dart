@@ -188,7 +188,7 @@ class Home extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ClassInformation(
-                            classIndex, classNameList[classIndex])),
+                            classIDList[classIndex], classNameList[classIndex])),
                   );
                 },
                 child: const Text('View/edit data', style: bodyText)),
