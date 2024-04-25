@@ -165,7 +165,7 @@ class Login extends StatelessWidget {
                 appBar: AppBar(
                   backgroundColor: primaryColor,
                   title: const Center(
-                    child: Text('Login to the database'),
+                    child: Text('Log in to the database'),
                   ),
                 ),
                 body: SingleChildScrollView(
@@ -258,7 +258,7 @@ class Login extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        // Login button.
+                        // Log in button.
                         height: 75,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -303,7 +303,7 @@ class Login extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                               ),
-                              child: const Text('Login', style: bodyText)),
+                              child: const Text('Log in', style: bodyText)),
                         ),
                       ),
                     ],
