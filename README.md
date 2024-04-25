@@ -25,9 +25,10 @@ AttendEase is an cross-platform Flutter application that assists educators in ta
 9. Go back to AttendEase and select "Add session". Enter the class session date and paste the form URL.
 10. Tell students to scan the QR code and select their name. Export the form data once everyone has had the chance to verify themselves as present.
 11. Select "Edit class info" for your class and select "Import form data". Select the class session and paste the form CSV data. Select "Import form data" to import the data.
-12. To edit existing or missing attendance data, select "View/edit data". Select the data that you want to edit and select the option that you want to change the data to.
+12. To edit existing or missing attendance data, select "View/edit data". Select the data that you want to edit and select the option that you want to change the data to. See the table below to interpret the abbreviations and colors.
+## Key
 | Abbreviation | Expanded form        | Color                    |
-|--------------|----------------------|--------------------------|
+| ------------ | -------------------- | ------------------------ |
 | P            | Present              | Green                    |
 | AE           | Absent and excused   | Orange                   |
 | AU           | Absent and unexcused | Orange with red outline  |
