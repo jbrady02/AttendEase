@@ -142,8 +142,8 @@ class DatabaseHelper {
   void addClass(String className) async {
     Connection conn = await connectToDatabase();
     await conn.execute(
-      'INSERT INTO classes (class_name) VALUES (\$1)',
-      parameters: [className],
+      'INSERT INTO classes (class_name, students) VALUES (\$1, \$2)',
+      parameters: [className, '{}'],
     );
     await conn.close();
   }

@@ -1,4 +1,4 @@
-![Screenshot of AttendEase View/edit data page](https://github.com/jbrady02/Capstone/assets/89806788/df58d0e9-23af-4980-878f-46dc0f4a7b0a)
+![Screenshot of AttendEase View/edit data page](https://github.com/user-attachments/assets/c670b865-35eb-436e-96b7-13d89738d601)
 # AttendEase
 AttendEase is an cross-platform Flutter application that assists educators in taking attendance and storing the data of multiple different classes. This uses a PostgreSQL database to store the class, student, and attendance data. Attendance is collected via a Google form that students access via a QR code and the form results can be imported automatically.
 ## Features
@@ -27,11 +27,11 @@ AttendEase is an cross-platform Flutter application that assists educators in ta
 11. Select "Edit class info" for your class and select "Import form data". Select the class session and paste the form CSV data. Select "Import form data" to import the data.
 12. To edit existing or missing attendance data, select "View/edit data". Select the data that you want to edit and select the option that you want to change the data to. See the table below to interpret the abbreviations and colors.
 ## Key
-| Abbreviation | Expanded form        | Color                    |
-| ------------ | -------------------- | ------------------------ |
-| P            | Present              | Green                    |
-| AE           | Absent and excused   | Orange                   |
-| AU           | Absent and unexcused | Orange with red outline  |
-| TE           | Tardy and excused    | Yellow                   |
-| TU           | Tardy and unexcused  | Yellow with red outline  |
-| ?            | Unknown              | White with black outline |
+| Abbreviation | Expanded form        | Color                              |
+| ------------ | -------------------- | ---------------------------------- |
+| P            | Present              | Blue                               |
+| AE           | Absent and excused   | Red                                |
+| AU           | Absent and unexcused | Red with dark red outline          |
+| TE           | Tardy and excused    | Yellow-green                       |
+| TU           | Tardy and unexcused  | Yellow-green with dark red outline |
+| ?            | Unknown              | White with black outline           |

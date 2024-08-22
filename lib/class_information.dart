@@ -74,11 +74,11 @@ class ClassInformation extends StatelessWidget {
   Color _getColor(int attendanceInt) {
     switch (attendanceInt) {
       case present:
-        return Colors.green;
+        return const Color.fromARGB(255, 0, 153, 255); // Blue
       case absentExcused || absentUnexcused:
-        return Colors.orange;
+        return const Color.fromARGB(255, 255, 0, 0); // Red
       case tardyExcused || tardyUnexcused:
-        return Colors.yellow;
+        return const Color.fromARGB(255, 127, 255, 0); // Yellow-green
       default:
         return Colors.white;
     }
@@ -91,7 +91,7 @@ class ClassInformation extends StatelessWidget {
   Color _getOutlineColor(int attendanceInt) {
     switch (attendanceInt) {
       case absentUnexcused || tardyUnexcused:
-        return Colors.red;
+        return const Color.fromARGB(255, 127, 0, 0); // Dark red
       case unknown:
         return Colors.black;
       default:
@@ -121,7 +121,7 @@ class ClassInformation extends StatelessWidget {
           children: [
             Container(
               // Button to record student as present.
-              color: Colors.green,
+              color: const Color.fromARGB(255, 0, 153, 255), // Blue
               child: SimpleDialogOption(
                 onPressed: () {
                   DatabaseHelper dbHelper = DatabaseHelper();
@@ -140,7 +140,7 @@ class ClassInformation extends StatelessWidget {
             ),
             Container(
               // Button to record student as absent and excused.
-              color: Colors.orange,
+              color: const Color.fromARGB(255, 255, 0, 0), // Red
               child: SimpleDialogOption(
                 onPressed: () {
                   DatabaseHelper dbHelper = DatabaseHelper();
@@ -160,7 +160,7 @@ class ClassInformation extends StatelessWidget {
             ),
             Container(
               // Button to record student as absent and unexcused.
-              color: Colors.orange,
+              color: const Color.fromARGB(255, 255, 0, 0), // Red
               child: SimpleDialogOption(
                 onPressed: () {
                   DatabaseHelper dbHelper = DatabaseHelper();
@@ -180,7 +180,7 @@ class ClassInformation extends StatelessWidget {
             ),
             Container(
               // Button to record student as tardy and excused.
-              color: Colors.yellow,
+              color: const Color.fromARGB(255, 127, 255, 0), // Yellow-green
               child: SimpleDialogOption(
                 onPressed: () {
                   DatabaseHelper dbHelper = DatabaseHelper();
@@ -200,7 +200,7 @@ class ClassInformation extends StatelessWidget {
             ),
             Container(
               // Button to record student as tardy and unexcused.
-              color: Colors.yellow,
+              color: const Color.fromARGB(255, 127, 255, 0), // Yellow-green
               child: SimpleDialogOption(
                 onPressed: () {
                   DatabaseHelper dbHelper = DatabaseHelper();
